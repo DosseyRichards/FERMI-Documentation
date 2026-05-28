@@ -1,0 +1,169 @@
+site_name: Fermi · WaveLedger
+site_description: WaveLedger is the post-quantum Layer-1 by Fermi. API + usage + node operator reference.
+site_url: https://docs.waveledger.net/
+repo_url: https://github.com/DosseyRichards/Fermi-Mining-ASIC-Software
+repo_name: DosseyRichards/Fermi-Mining-ASIC-Software
+edit_uri: ""
+
+docs_dir: docs
+
+theme:
+  name: material
+  custom_dir: overrides
+  logo: assets/fermi_icon_black.png
+  favicon: assets/fermi_icon_black.png
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/file-document-edit-outline
+  palette:
+    - media: "(prefers-color-scheme)"
+      scheme: slate
+      primary: black
+      accent: cyan
+      toggle:
+        icon: material/brightness-auto
+        name: Toggle to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Toggle to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Toggle to system preference
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.action.edit
+    - content.tabs.link
+    - announce.dismiss
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/DosseyRichards
+    - icon: fontawesome/brands/x-twitter
+      link: https://x.com/
+  generator: false
+  alternate:
+    - name: WaveLedger Chain Docs
+      link: https://docs.waveledger.net
+      lang: en
+    - name: Fermi Product Docs
+      link: https://docs.fermi.world
+      lang: en
+    - name: Fourier Language
+      link: https://fourier.fermi.world
+      lang: en
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: ¶
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.caret
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+plugins:
+  - search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+
+nav:
+  - Home: index.md
+  - Concepts:
+      - concepts/index.md
+      - Post-quantum cryptography: concepts/pqc.md
+      - Blocks and consensus: concepts/blocks.md
+      - QRNG and entropy: concepts/entropy.md
+      - Addresses and wallets: concepts/addresses.md
+      - Gas, fees, and economics: concepts/economics.md
+      - Mining: concepts/mining.md
+      - Networking: concepts/networking.md
+  - API Reference:
+      - api/index.md
+      - Authentication: api/auth.md
+      - Wallet API: api/wallet.md
+      - Chat / Messenger API: api/chat.md
+      - Playground (contracts) API: api/playground.md
+      - Explorer API: api/explorer.md
+      - Admin API: api/admin.md
+      - Dashboard (node-local) API: api/dashboard.md
+      - Server-Sent Events: api/sse.md
+  - Nodes:
+      - nodes/index.md
+      - Running a miner: nodes/miner.md
+      - Running a seed node: nodes/seed.md
+      - Running the entropy aggregator: nodes/entropy.md
+      - Self-hosting on Fly.io: nodes/fly.md
+      - Self-hosting on a VPS: nodes/vps.md
+      - Config reference: nodes/config.md
+      - Operational runbook: nodes/runbook.md
+  - SDK and Examples:
+      - sdk/index.md
+      - Python client: sdk/python.md
+      - JavaScript / browser: sdk/javascript.md
+      - Signing transactions: sdk/signing.md
+      - Subscribing to events: sdk/events.md
+  - Reference:
+      - reference/index.md
+      - Transaction format: reference/tx.md
+      - Block format: reference/block.md
+      - Receipt format: reference/receipt.md
+      - Address format: reference/address.md
+      - Genesis and tokenomics: reference/tokenomics.md
+      - Network parameters: reference/parameters.md
+      - Crypto primitives: reference/crypto.md
+      - Glossary: reference/glossary.md
+  - Smart contracts:
+      - "Fourier language → fourier.fermi.world": https://fourier.fermi.world
