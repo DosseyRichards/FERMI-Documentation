@@ -18,7 +18,6 @@ contract that lets us swap in QRNG hardware (or any other source) without
 forking the chain.
 
 [Live testnet :material-arrow-right:](https://chat.waveledger.net){ .md-button .md-button--primary }
-[Source on GitHub :material-arrow-right:](https://github.com/DosseyRichards/Fermi-Mining-ASIC-Software){ .md-button }
 
 ---
 

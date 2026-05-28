@@ -7,7 +7,7 @@ in **Bohms** — the smallest unit, where:
 
 $$ 1 \text{ WAVE} = 10^{18} \text{ Bohms} $$
 
-(Named after Niels Bohr. Bohms are to WAVE what wei is to ETH or
+(Named after David Bohm. Bohms are to WAVE what wei is to ETH or
 satoshis are to BTC.)
 
 All on-the-wire amounts in JSON APIs use floats in WAVE units (e.g.

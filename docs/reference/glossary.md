@@ -32,8 +32,8 @@ attestation protocol. EVM-flavored terms with EVM-identical meaning
 
 **Bohm**
 :   The smallest unit of WAVE; `1 WAVE = 10^18 bohms`. Smart contract
-    gas is denominated in bohms. Named after Bohm-like quanta in keeping
-    with the Fermi-themed naming.
+    gas is denominated in bohms. Named after the physicist **David
+    Bohm**, in keeping with the Fermi-themed naming.
 
 **Coinbase**
 :   The first transaction in every non-genesis block. Sender is the

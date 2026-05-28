@@ -1,8 +1,6 @@
 site_name: WaveLedger
 site_description: WaveLedger is the post-quantum Layer-1 by Fermi. API + usage + node operator reference.
 site_url: https://docs.waveledger.net/
-repo_url: https://github.com/DosseyRichards/Fermi-Mining-ASIC-Software
-repo_name: DosseyRichards/Fermi-Mining-ASIC-Software
 edit_uri: ""
 
 docs_dir: docs
@@ -16,7 +14,6 @@ theme:
     text: Inter
     code: JetBrains Mono
   icon:
-    repo: fontawesome/brands/github
     edit: material/file-document-edit-outline
   palette:
     - media: "(prefers-color-scheme)"
@@ -61,8 +58,6 @@ theme:
 
 extra:
   social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/DosseyRichards
     - icon: fontawesome/brands/x-twitter
       link: https://x.com/
   generator: false
@@ -127,6 +122,7 @@ nav:
   - Concepts:
       - concepts/index.md
       - Post-quantum cryptography: concepts/pqc.md
+      - Crypto agility: concepts/agility.md
       - Blocks and consensus: concepts/blocks.md
       - QRNG and entropy: concepts/entropy.md
       - Addresses and wallets: concepts/addresses.md
