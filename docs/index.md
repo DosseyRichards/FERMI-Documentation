@@ -29,6 +29,18 @@ forking the chain.
 
 [Live testnet :material-arrow-right:](https://chat.waveledger.net){ .md-button .md-button--primary }
 
+## Install the SDK
+
+```bash
+pip install waveledger-sdk        # PyPI
+npm  install waveledger-sdk        # npm
+```
+
+One `Client` class covers every messenger surface (auth, chat, wallet,
+explorer, playground, admin) plus the SSE event stream. Both libraries
+default to `https://api.waveledger.net`. See
+[SDK and examples](sdk/index.md) for the full API.
+
 ---
 
 ## What's in these docs
