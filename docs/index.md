@@ -7,10 +7,20 @@ hide:
 
 # WaveLedger
 
-A post-quantum Layer-1 blockchain. Every transaction is signed with
-**ML-DSA-87** (NIST FIPS 204), every key exchange uses **ML-KEM-1024**
-(FIPS 203), every hash is **SHA3-512**. No classical cryptography
+A post-quantum Layer-1 blockchain built on the current **NIST PQC
+standards**: every transaction is signed with **ML-DSA-87**
+(NIST FIPS 204), every key exchange uses **ML-KEM-1024** (FIPS 203),
+every hash is **SHA3-512** (FIPS 202). No classical cryptography
 anywhere in the chain.
+
+**Designed to stay current.** Post-quantum standards are young; the
+chain is built to evolve with them. Signature schemes are dispatched
+through a runtime registry, entropy sources are versioned by tag, and
+new PQC primitives plug in as precompiles — no hard fork, no
+coordinated chain halt, no rip-and-replace migration. Adding a new
+NIST-standardized scheme is a node release, not a chain split. See
+[Crypto agility](concepts/agility.md) for what's already swappable
+today.
 
 Mining requires a verifiable entropy attestation — the testnet uses the
 [drand](https://drand.love) federated beacon, with a vendor-agnostic
