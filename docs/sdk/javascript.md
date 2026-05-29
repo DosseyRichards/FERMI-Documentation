@@ -14,7 +14,7 @@ ESM-native, dependency-free — runs in Node 18+ and modern browsers
 ## Install
 
 ```bash
-npm install waveledger
+npm install waveledger-sdk
 ```
 
 Or, from source:
@@ -28,7 +28,7 @@ npm install && npm run build
 ## Quickstart
 
 ```ts
-import { Client } from "waveledger";
+import { Client } from "waveledger-sdk";
 
 const c = new Client();   // defaults to https://api.waveledger.net
 
@@ -125,7 +125,7 @@ for await (const ev of c.subscribe({
 import {
   AuthError, NotFoundError, RateLimitedError,
   ValidationError, ServerError, WaveLedgerError,
-} from "waveledger";
+} from "waveledger-sdk";
 
 try {
   await c.walletSend({ to: "bad", amount: -1 });

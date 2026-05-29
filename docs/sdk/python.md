@@ -13,6 +13,13 @@ event stream.
 
 ## Install
 
+```bash
+pip install waveledger-sdk
+```
+
+The PyPI distribution is `waveledger-sdk`; the importable module is
+`waveledger`. Your code stays `from waveledger import Client`.
+
 From the WaveLedger source tree:
 
 ```bash
