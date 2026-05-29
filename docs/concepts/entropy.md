@@ -8,18 +8,26 @@ that distinguishes WaveLedger from a generic PoW chain.
 
 For a block to be valid:
 
-1. The miner must fetch ≥ 64 bytes of entropy from a registered entropy
-   source.
+1. The miner must fetch ≥ 64 bytes of entropy from an entropy source.
+   The first 32 bytes are the **seed** (mixed into the block header
+   for PoW); the last 32 are the **proof** (revealed for verification).
 2. The miner must include an **attestation envelope** in the block
    (`quantum_signature`):
-   - The raw entropy commitment: `SHA3-512(entropy)`
-   - Health metadata from the source (timestamp, source ID, version)
-   - The source's signature over the commitment + metadata
-3. The entropy must be used as the **`quantum_seed`** in the block
-   template — meaning the proof-of-work hash incorporates it.
-4. Validators must accept the attestation: either the source's
-   public key is registered on-chain, or the source ID is in the
-   `ENTROPY_SOURCES_TRUST_LIST` network parameter.
+   - `entropy_seed` and `entropy_proof` (32-byte hex each)
+   - `commitment = SHA3-512(entropy_proof)` so any node can reconstruct
+     and check it
+   - `health` snapshot (monobit ratio, Fano factor, pool size)
+   - `source` — the registered source ID (see
+     [Source registry](#source-registry) below)
+   - `device_id`, `proof_type`, `version`
+3. The seed must be incorporated into the **block header** that PoW
+   hashes, so a miner cannot grind on different entropy after-the-fact.
+4. Validators reject any block whose `source` is not in the registry,
+   whose `commitment` doesn't match `SHA3-512(entropy_proof)`, or whose
+   health stats fall outside the configured statistical bounds. A
+   source-side signature path (per-source registered public key
+   verifying a signature over the commitment) is on the roadmap and
+   will arrive with `proof_type` v2.
 
 ## Why this matters
 

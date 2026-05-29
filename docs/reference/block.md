@@ -73,23 +73,45 @@ convention). Coinbase is always leaf 0.
 
 ## QRNG attestation envelope
 
-The `quantum_signature` block is structured:
+The `quantum_signature` block has this shape (from
+`mining/attestation.py::generate_attestation`):
 
 ```json
 {
   "qrng_attestation": {
-    "entropy_seed": "<32-byte hex>",
-    "commitment":   "<sha3-512 of raw entropy + metadata>",
-    "source":       "aggregator:drand-default",
-    "source_round": 4567890,
-    "device_id":    "qrng_<node-id-prefix>",
-    "timestamp":    1780002999.0,
-    "health":       { /* source-specific health stats */ }
-  },
-  "signature":      "<source signature over commitment>",
-  "public_key":     "<source public key>"
+    "version":       1,
+    "entropy_seed":  "<32-byte hex>",
+    "entropy_proof": "<32-byte hex>",
+    "commitment":    "<sha3-512 of entropy_proof, hex>",
+    "source":        "aggregator:drand-default",
+    "device_id":     "qrng_<node-id-prefix>",
+    "proof_type":    "qrng_hardware_attestation_v1",
+    "health": {
+      "monobit_ratio": 0.503,
+      "fano_factor":   1.02,
+      "pool_size":     65536,
+      "timestamp":     1780002999.0
+    }
+  }
 }
 ```
+
+| Field | Required | Notes |
+|---|---|---|
+| `version` | yes | Currently `1` |
+| `entropy_seed` | yes | 32-byte hex, mixed into the block header for PoW |
+| `entropy_proof` | yes | 32-byte hex, the revealed half whose hash matches `commitment` |
+| `commitment` | yes | `SHA3-512(entropy_proof)`, hex |
+| `source` | optional | One of the IDs registered in [`SourceRegistry`](../concepts/entropy.md#source-registry). Absent on v0 blocks. |
+| `device_id` | yes | Free-form node identifier |
+| `proof_type` | yes | Versioned tag; future schemes increment this |
+| `health` | yes | Source-specific stats; the four shown are enforced bounds |
+
+`signature` and `public_key` are **not** produced by the current
+implementation — there is no source-side signing path yet. They are
+reserved for a future revision (`proof_type` will increment when it
+ships) where the entropy aggregator signs its responses and the
+validator verifies them against a per-source registered public key.
 
 Validation rules — enforced by `mining/attestation.py::verify_attestation`:
 
@@ -106,8 +128,9 @@ Validation rules — enforced by `mining/attestation.py::verify_attestation`:
 
 Back-compat: v0 blocks lacking a `source` field still verify. Per-source
 signature verification under a registered public key is on the roadmap;
-the current envelope shape is open to receiving `signature` and
-`public_key` once the entropy aggregator signs its responses.
+when it ships, `proof_type` will increment from
+`qrng_hardware_attestation_v1` to `_v2` and the envelope will gain
+outer `signature` and `public_key` fields.
 
 ## Genesis block
 
