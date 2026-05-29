@@ -167,7 +167,7 @@ es.onerror = () => {
 
 ```python
 import requests, json
-r = requests.get('https://chat.waveledger.net/api/stream',
+r = requests.get('https://api.waveledger.net/api/stream',
                  cookies={'session': '...'}, stream=True)
 for line in r.iter_lines():
     if line and line.startswith(b'data: '):

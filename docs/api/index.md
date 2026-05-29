@@ -2,17 +2,20 @@
 
 !!! info "Base URL"
 
-    On the public testnet, the messenger and explorer APIs are served at:
+    On the public testnet, the canonical base URL is:
 
     ```text
-    https://chat.waveledger.net
+    https://api.waveledger.net
     ```
 
-    Every path in this section is relative to that base. So
-    `/api/messages` means `https://chat.waveledger.net/api/messages`.
-    The `seed.waveledger.net` hostname resolves to the same machine and
-    serves the same API — it exists because that name is what other P2P
-    peers dial; either host works for HTTP clients.
+    Every path in this section is relative to that base — so
+    `/api/messages` means `https://api.waveledger.net/api/messages`.
+
+    `chat.waveledger.net` and `seed.waveledger.net` resolve to the same
+    Fly machine and serve the same routes; `api.` is the durable name
+    for programmatic clients, while `chat.` is for the dApp UI and
+    `seed.` is what other P2P peers dial. Any of the three works for
+    HTTP clients.
 
     Self-hosted nodes serve the same routes on `http://localhost:8081`
     by default (override with `--messenger-port`).
@@ -25,8 +28,8 @@ Every WaveLedger node exposes three HTTP APIs:
 | **Explorer** | 8081 (same as messenger) | None | Anyone (public chain data) |
 | **Dashboard** | 8080 (loopback) | API key | Node operator / monitoring |
 
-On the public testnet, the messenger + explorer are served at
-[`https://chat.waveledger.net`](https://chat.waveledger.net) (fly's
+On the public testnet, the messenger + explorer are reached via
+[`https://api.waveledger.net`](https://api.waveledger.net) (Fly's
 edge does TLS termination + proxies to port 8081). The dashboard
 stays on loopback by default and is reached via `fly ssh console`.
 

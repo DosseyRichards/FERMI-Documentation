@@ -7,7 +7,7 @@ event stream.
 
 !!! info "Base URL"
 
-    Every example below talks to `https://chat.waveledger.net`. Point
+    Every example below talks to `https://api.waveledger.net`. Point
     the `Client` at any other host (e.g. `http://localhost:8081` for a
     self-hosted node) and the same code works.
 
@@ -34,7 +34,7 @@ cp -r clients/python/waveledger ./vendor/
 ```python
 from waveledger import Client
 
-c = Client("https://chat.waveledger.net")
+c = Client("https://api.waveledger.net")
 
 # Sign up with an invite (instant approval + 100 testnet WAVE)
 c.signup("alice", invite_code="WAVE-ABC123")
@@ -85,7 +85,7 @@ c.playground.receipt(tx_id)
 c.playground.contracts()
 
 # Admin (HTTP Basic — pass admin=(user, pw) at construction)
-ac = Client("https://chat.waveledger.net", admin=("admin", "PASSWORD"))
+ac = Client("https://api.waveledger.net", admin=("admin", "PASSWORD"))
 ac.admin.pending()
 ac.admin.approve(name)
 ac.admin.block(name, reason=None)
@@ -161,14 +161,14 @@ and pass it back at construction:
 
 ```python
 # First run
-c = Client("https://chat.waveledger.net")
+c = Client("https://api.waveledger.net")
 c.signup("alice", invite_code="WAVE-ABC123")
 token = c._http.cookies.get("session")   # save somewhere safe
 ```
 
 ```python
 # Later
-c = Client("https://chat.waveledger.net", session=token)
+c = Client("https://api.waveledger.net", session=token)
 c.me()                                    # still logged in
 ```
 

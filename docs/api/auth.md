@@ -23,12 +23,12 @@ ergonomics; mainnet will persist sessions.)
 To attach the cookie from `curl`:
 
 ```bash
-curl -c cookies.jar -X POST https://chat.waveledger.net/api/login \
+curl -c cookies.jar -X POST https://api.waveledger.net/api/login \
   -H 'Content-Type: application/json' \
   -d '{"name":"alice","token":"login-token-from-admin"}'
 
 # Subsequent requests
-curl -b cookies.jar https://chat.waveledger.net/api/me
+curl -b cookies.jar https://api.waveledger.net/api/me
 ```
 
 ## HTTP Basic (admin)
@@ -49,7 +49,7 @@ startup if the default is in use.
 Example:
 
 ```bash
-curl -u admin:your-password https://chat.waveledger.net/api/admin/pending
+curl -u admin:your-password https://api.waveledger.net/api/admin/pending
 ```
 
 The browser will prompt for credentials when you visit `/admin`. Most

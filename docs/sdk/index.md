@@ -14,7 +14,7 @@ cookies + SSE, so `fetch` and `EventSource` work today — see the
     Every code sample in this section talks to:
 
     ```text
-    https://chat.waveledger.net
+    https://api.waveledger.net
     ```
 
     Self-hosted nodes serve the same routes on `http://localhost:8081`

@@ -13,7 +13,7 @@ See [Server-Sent Events](../api/sse.md) for the full endpoint spec.
 import requests, json
 
 with requests.get(
-    'https://chat.waveledger.net/api/stream',
+    'https://api.waveledger.net/api/stream',
     cookies={'session': '...'}, stream=True,
 ) as r:
     for line in r.iter_lines():
@@ -29,7 +29,7 @@ block events.
 
 ```python
 with requests.get(
-    'https://chat.waveledger.net/api/stream?types=block',
+    'https://api.waveledger.net/api/stream?types=block',
     cookies={'session': '...'}, stream=True,
 ) as r:
     for line in r.iter_lines():
@@ -45,7 +45,7 @@ with requests.get(
 ```python
 addr = '34378b1ba5be9d0999acd60be3a8a1f1'
 with requests.get(
-    f'https://chat.waveledger.net/api/stream?address={addr}',
+    f'https://api.waveledger.net/api/stream?address={addr}',
     cookies={'session': '...'}, stream=True,
 ) as r:
     for line in r.iter_lines():
@@ -67,7 +67,7 @@ miner, and message author. Combine with `types=` to narrow further:
 
 ```python
 with requests.get(
-    'https://chat.waveledger.net/api/stream?types=receipt',
+    'https://api.waveledger.net/api/stream?types=receipt',
     cookies={'session': '...'}, stream=True,
 ) as r:
     for line in r.iter_lines():
@@ -88,10 +88,10 @@ import requests, time
 
 last_height = 0
 while True:
-    s = requests.get('https://chat.waveledger.net/api/explorer/stats').json()
+    s = requests.get('https://api.waveledger.net/api/explorer/stats').json()
     if s['height'] > last_height:
         for h in range(last_height + 1, s['height'] + 1):
-            b = requests.get(f'https://chat.waveledger.net/api/explorer/block/{h}').json()
+            b = requests.get(f'https://api.waveledger.net/api/explorer/block/{h}').json()
             print(f"block {h}: {b['tx_count']} txs")
         last_height = s['height']
     time.sleep(2)
@@ -107,7 +107,7 @@ After submitting a deploy or call, poll the receipt endpoint:
 ```python
 import requests, time
 
-def wait_for_receipt(tx_id, base='https://chat.waveledger.net', timeout=30):
+def wait_for_receipt(tx_id, base='https://api.waveledger.net', timeout=30):
     deadline = time.time() + timeout
     while time.time() < deadline:
         r = requests.get(f'{base}/api/explorer/tx/{tx_id}').json()
