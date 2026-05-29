@@ -91,16 +91,23 @@ The `quantum_signature` block is structured:
 }
 ```
 
-Validation rules:
+Validation rules — enforced by `mining/attestation.py::verify_attestation`:
 
-1. `entropy_seed` length = 32 bytes
-2. `commitment` hashes to `sha3_512(entropy_seed || canonical(health))`
-3. `signature` verifies under `public_key` against `commitment`
-4. `public_key` (or `source` ID) is in the chain's
-   [trust list](../concepts/entropy.md#source-registry)
-5. `timestamp` within ±60 sec of block timestamp
+1. `entropy_seed` and `entropy_proof` are both exactly 32 bytes
+2. `commitment` matches `sha3_512(entropy_proof)`
+3. `health.monobit_ratio` is within `[0.40, 0.60]`
+4. `health.fano_factor` is within `[0.5, 1.5]`
+5. Chi-squared p-value on `entropy_proof` ≥ `0.001`
+6. Monobit ratio of `entropy_proof` is within `[0.35, 0.65]`
+7. `source` (when present) is in the
+   [SourceRegistry trust list](../concepts/entropy.md#source-registry).
+   Aggregator-composed IDs (`aggregator:a+b+c`) are allowed iff every
+   component is itself registered.
 
-See `mining/attestation.py` for the implementation.
+Back-compat: v0 blocks lacking a `source` field still verify. Per-source
+signature verification under a registered public key is on the roadmap;
+the current envelope shape is open to receiving `signature` and
+`public_key` once the entropy aggregator signs its responses.
 
 ## Genesis block
 
