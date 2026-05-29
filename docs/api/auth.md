@@ -14,11 +14,12 @@ Set when the user logs in via `POST /api/login` (or self-onboards via
 | Format | URL-safe random 24-byte token (`secrets.token_urlsafe`) |
 | HttpOnly | yes |
 | SameSite | Lax |
-| Lifetime | Until restart (in-memory store on the testnet) |
+| Lifetime | Persists across node restarts (SQLite-backed) |
 
-Sessions are stored in process memory in the testnet build — a node
-restart wipes them. End users have to re-login. (This is testnet
-ergonomics; mainnet will persist sessions.)
+Sessions are persisted to SQLite at `{data_dir}/admin.db` via
+[`api/admin_store.py`](admin.md#persistence) — node restarts do **not**
+invalidate cookies, drop the pending queue, or void invite codes.
+End users stay logged in across deploys.
 
 To attach the cookie from `curl`:
 

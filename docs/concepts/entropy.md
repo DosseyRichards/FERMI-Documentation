@@ -41,20 +41,31 @@ This makes the chain attractive to:
 
 ## Source registry
 
-The chain doesn't care **what** the entropy source is, only that it
-exposes the standard REST contract and that its public key is in the
-trust list.
+The block's `source` field records which entropy provider produced
+this block's seed. Today the chain stores the field on every block as
+an audit trail but does **not** yet reject blocks whose source ID is
+unknown — `verify_attestation` only enforces a length bound on the
+string. Allow-listing the registered IDs and verifying a per-source
+signature are the next two enforcement steps (tracked in
+`mining/attestation.py`); see
+[Crypto agility](agility.md#what-is-agile-today) for the broader
+design.
 
-The current trust list (testnet):
+Sources currently seen on testnet:
 
-| Source ID | Description | Status |
+| Source ID | Description | Enforced |
 |---|---|---|
-| `aggregator:drand-default` | drand "default" beacon (League of Entropy) | Active |
-| `fermi-qrng-v1` | Fermi shot-noise photodiode hardware | Reserved |
-| `iqr-server-v0` | Future: ID Quantique reference hardware | Reserved |
+| `aggregator:drand-default` | drand "default" beacon via the in-tree aggregator | No allow-list yet |
+| `self-hosted` | The miner's local entropy stack (default if a provider doesn't set `source_id`) | No allow-list yet |
 
-Adding a new source is governance-controlled — see
-[BDFL + Timelock](../reference/parameters.md#governance).
+Planned (not deployed):
+
+- `fermi-qrng-v1` — Fermi shot-noise photodiode hardware
+- `iqr-server-v0` — ID Quantique reference hardware
+
+Adding a new source will be governance-controlled once the registry
+ships; the design intent is BDFL-signed registration with a Timelock
+delay, but the on-chain hooks for either are not yet built.
 
 ## The REST contract
 
