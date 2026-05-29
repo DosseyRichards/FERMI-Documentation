@@ -103,7 +103,7 @@ fee). Custom-fee transfers will land with the next mempool revision.
 
 ---
 
-## POST /api/wallet/export
+## POST /api/wallet/export { #export }
 
 Download an encrypted backup of the user's wallet. The backup is an
 AES-256-GCM ciphertext with the user's passphrase deriving the key

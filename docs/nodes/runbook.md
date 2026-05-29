@@ -142,8 +142,36 @@ fi
 ```
 
 Put it in cron every minute. Add similar checks for `peer_count` and
-`qrng_reachable`. Real production wants Prometheus + Grafana — there's
-a TODO to add the `/metrics` endpoint.
+`qrng_reachable`.
+
+For Prometheus + Grafana, the dashboard exposes Prometheus
+text-format metrics at `/metrics`:
+
+```yaml
+# prometheus.yml
+scrape_configs:
+  - job_name: waveledger
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['127.0.0.1:8080']
+```
+
+Exported gauges (one line per metric):
+
+| Metric | Meaning |
+|---|---|
+| `waveledger_chain_height` | Tip block index |
+| `waveledger_tip_timestamp` | Unix seconds of the tip block |
+| `waveledger_total_supply` | WAVE minted so far |
+| `waveledger_difficulty` | Current PoW leading-zero count |
+| `waveledger_mempool_size` | Pending tx count |
+| `waveledger_peer_count` | Connected P2P peers |
+| `waveledger_mining_active` | `1` if miner running, else `0` |
+| `waveledger_synced` | `1` if IBD complete, else `0` |
+| `waveledger_uptime_seconds` | Process uptime |
+
+No auth on `/metrics` even when `require_auth=true`; scrape over a
+private network or behind a reverse-proxy ACL.
 
 ## Upgrades
 

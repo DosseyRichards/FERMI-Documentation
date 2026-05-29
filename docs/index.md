@@ -54,7 +54,7 @@ default to `https://api.waveledger.net`. See
     The chain from first principles — post-quantum crypto, block
     structure, mining + entropy, economics, addresses, networking.
 
-    [:octicons-arrow-right-24: Read the concepts](concepts/)
+    [:octicons-arrow-right-24: Read the concepts](concepts/index.md)
 
 -   :material-api:{ .lg .middle } **API Reference**
 
@@ -63,7 +63,7 @@ default to `https://api.waveledger.net`. See
     Every public REST endpoint: wallet, chat, contract playground,
     explorer, admin. With request/response examples for each.
 
-    [:octicons-arrow-right-24: Browse the API](api/)
+    [:octicons-arrow-right-24: Browse the API](api/index.md)
 
 -   :material-server:{ .lg .middle } **Running a node**
 
@@ -72,7 +72,7 @@ default to `https://api.waveledger.net`. See
     Run your own miner, seed, or entropy aggregator. Fly.io and
     bare-VPS guides. Operational runbook for production.
 
-    [:octicons-arrow-right-24: Node operator guide](nodes/)
+    [:octicons-arrow-right-24: Node operator guide](nodes/index.md)
 
 -   :material-code-braces:{ .lg .middle } **SDK and examples**
 
@@ -81,7 +81,7 @@ default to `https://api.waveledger.net`. See
     Send WAVE, deploy contracts, subscribe to events — from Python
     and from the browser. Working snippets, not just signatures.
 
-    [:octicons-arrow-right-24: Get coding](sdk/)
+    [:octicons-arrow-right-24: Get coding](sdk/index.md)
 
 -   :material-file-document:{ .lg .middle } **Reference**
 
@@ -90,7 +90,7 @@ default to `https://api.waveledger.net`. See
     Wire formats for blocks, transactions, receipts, addresses;
     network parameters; the full crypto primitive list.
 
-    [:octicons-arrow-right-24: Format specs](reference/)
+    [:octicons-arrow-right-24: Format specs](reference/index.md)
 
 -   :material-script-text-outline:{ .lg .middle } **Fourier (smart contracts)**
 
