@@ -1,5 +1,22 @@
 # API Reference
 
+!!! info "Base URL"
+
+    On the public testnet, the messenger and explorer APIs are served at:
+
+    ```text
+    https://chat.waveledger.net
+    ```
+
+    Every path in this section is relative to that base. So
+    `/api/messages` means `https://chat.waveledger.net/api/messages`.
+    The `seed.waveledger.net` hostname resolves to the same machine and
+    serves the same API — it exists because that name is what other P2P
+    peers dial; either host works for HTTP clients.
+
+    Self-hosted nodes serve the same routes on `http://localhost:8081`
+    by default (override with `--messenger-port`).
+
 Every WaveLedger node exposes three HTTP APIs:
 
 | API | Default port | Auth | Audience |

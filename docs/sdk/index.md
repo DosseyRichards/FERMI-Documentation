@@ -1,8 +1,24 @@
 # SDK and examples
 
-WaveLedger has no published SDK package yet. Until then, every API
-operation is reachable via standard HTTP + JSON, and the chain's
-internals are importable directly from the Python source.
+The official Python SDK ships in the WaveLedger source tree at
+`clients/python/waveledger/`. One `Client` class covers every messenger
+surface plus the SSE event stream. See
+[Python client](python.md) for installation + the full API.
+
+A JavaScript SDK is on the roadmap (the messenger is plain HTTP +
+cookies + SSE, so `fetch` and `EventSource` work today — see the
+[browser examples](javascript.md)).
+
+!!! info "Base URL"
+
+    Every code sample in this section talks to:
+
+    ```text
+    https://chat.waveledger.net
+    ```
+
+    Self-hosted nodes serve the same routes on `http://localhost:8081`
+    by default (override with `--messenger-port`).
 
 ## Pick your path
 
