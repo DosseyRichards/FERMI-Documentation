@@ -7,13 +7,20 @@ Things noticed while writing that should be filled in.
   how to verify, where the attestation key comes from
   (`mining/attestation.py`)
 - [ ] Document rate limits per endpoint (currently only chat send has one)
-- [ ] Document CORS policy (we set `Access-Control-Allow-Origin: *` on
-  JSON responses but no preflight handling — confirm + document)
+- [x] CORS preflight — shipped: every request goes through `_cors_middleware`
+  in `api/messenger.py`, which answers `OPTIONS` directly with the right
+  headers and decorates non-preflight responses too
 - [ ] Document admin session model — is HTTP Basic stateless, or does
   setting `WAVELEDGER_ADMIN_PASSWORD` rotate at restart? (it's stateless;
   document explicitly)
 - [ ] Document the `signing_key` vs `private_key` distinction on wallet
   objects (and which is needed for `sign_transaction`)
+- [x] SSE: block / tx / receipt events — shipped, plus `?types=` and
+  `?address=` server-side filters. See `api/sse.md`.
+- [x] Admin state persistence — shipped via `api/admin_store.py`
+  (SQLite at `{data_dir}/admin.db`). Pending, approved, blocked,
+  sessions, and invites all survive restart.
+- [x] Unblock endpoint — `POST /api/admin/unblock`. See `api/admin.md`.
 
 ## Nodes
 - [ ] Document P2P protocol wire format (`network/protocol.py`) for

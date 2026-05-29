@@ -68,11 +68,23 @@ approved + pending sets.
 { "name": "spammer" }
 ```
 
-Response: `{"status":"blocked","name":"spammer"}`.
+Response: `{"status":"blocked","name":"spammer"}`. Optionally include
+`reason` in the body — it's stored on the blocked record for the audit
+trail.
 
-Blocked names are also removed from `approved`; if you want to "unblock"
-later, currently requires editing in-memory state via a restart (and
-re-approving). A first-class unblock endpoint is a [TODO](https://github.com/DosseyRichards/FERMI-Documentation/blob/main/TODO.md).
+Blocked names are removed from `approved` and `pending` and their
+active sessions are revoked. To allow the name back, use
+[`POST /api/admin/unblock`](#post-apiadminunblock); the user must then
+re-sign-up to get a fresh wallet and login token.
+
+## POST /api/admin/unblock
+
+```json
+{ "name": "spammer" }
+```
+
+Response: `{"status":"unblocked","name":"spammer"}` (200), or
+`{"error":"not blocked"}` (404) if the name wasn't on the blocked list.
 
 ---
 
@@ -167,13 +179,27 @@ remain approved with their faucet'd balance.
 
 ---
 
-## Notes on the in-memory model
+## Persistence
 
-All admin state (pending queue, approved users, sessions, invite codes)
-lives in **process memory** on the testnet node. A node restart
-wipes all of it.
+Admin state — pending queue, approved users, blocked names, active
+sessions, and invite codes — is persisted to SQLite at
+`{data_dir}/admin.db` alongside the chain DB. Every mutation writes
+through synchronously; reads still come from the in-memory mirror for
+speed. Effects:
 
-In a real deployment this gets promoted to SQLite. The TODO list at
-[`TODO.md`](https://github.com/DosseyRichards/FERMI-Documentation/blob/main/TODO.md) tracks this. For the demo, the trade-off
-is intentional: fewer moving parts, and the chain's data (which is
-what actually matters) lives on disk via SQLite already.
+- Node restarts do **not** invalidate session cookies, drop the pending
+  queue, void invite codes, or undo blocks.
+- A clean re-sync of the chain data does not disturb admin state
+  (`chain.db` and `admin.db` are separate files).
+- `admin.db` is a normal SQLite file you can inspect with
+  `sqlite3 /data/admin.db` for debugging.
+
+Tables (see `api/admin_store.py`):
+
+```text
+approved  (name PK, address, login_token, joined_at, extra_json)
+pending   (name PK, signed_up_at, ip)
+blocked   (name PK, blocked_at, reason)
+sessions  (token PK, name, created_at, last_seen)
+invites   (code PK, max_uses, used, created_at, revoked, note)
+```

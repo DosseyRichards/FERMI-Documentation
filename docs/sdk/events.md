@@ -1,11 +1,13 @@
 # Subscribing to events
 
-WaveLedger exposes one push stream — the chat dApp's SSE feed for new
-messages — and everything else is polling.
-
-## Chat messages: SSE
+WaveLedger exposes a single SSE stream that pushes **every** chain-side
+state change — new blocks, every confirmed transaction, chat messages,
+and contract receipts. Server-side filtering by event type and address
+keeps client code small.
 
 See [Server-Sent Events](../api/sse.md) for the full endpoint spec.
+
+## All events (firehose)
 
 ```python
 import requests, json
@@ -19,15 +21,67 @@ with requests.get(
             print(json.loads(line[6:]))
 ```
 
-The stream emits a `message` event whenever a new message lands in the
-mempool, and again with `status: "confirmed"` when it's mined. Dedupe
-on `(tx_id, status)`.
+The stream emits four event types: `block`, `tx`, `message`, `receipt`.
+Dedupe defensively on `tx_id` for tx-shaped events and `height` for
+block events.
 
-## New blocks: poll
+## New blocks only
 
-There is no native block-notification stream yet. The two patterns:
+```python
+with requests.get(
+    'https://chat.waveledger.net/api/stream?types=block',
+    cookies={'session': '...'}, stream=True,
+) as r:
+    for line in r.iter_lines():
+        if not line.startswith(b'data: '):
+            continue
+        ev = json.loads(line[6:])
+        b = ev['block']
+        print(f"block {b['height']}: {b['tx_count']} txs, miner {b['miner'][:16]}")
+```
 
-### Poll the explorer
+## Watch one address
+
+```python
+addr = '34378b1ba5be9d0999acd60be3a8a1f1'
+with requests.get(
+    f'https://chat.waveledger.net/api/stream?address={addr}',
+    cookies={'session': '...'}, stream=True,
+) as r:
+    for line in r.iter_lines():
+        if line.startswith(b'data: '):
+            ev = json.loads(line[6:])
+            # ev['type'] in {'tx', 'message', 'receipt', 'block'}; filtered
+            # server-side to events that name `addr` in any role.
+            print(ev['type'], ev)
+```
+
+The `address` filter matches sender, recipient, `to`, contract address,
+miner, and message author. Combine with `types=` to narrow further:
+
+```text
+/api/stream?types=tx,receipt&address=<addr>
+```
+
+## Contract receipts only
+
+```python
+with requests.get(
+    'https://chat.waveledger.net/api/stream?types=receipt',
+    cookies={'session': '...'}, stream=True,
+) as r:
+    for line in r.iter_lines():
+        if line.startswith(b'data: '):
+            print(json.loads(line[6:])['receipt'])
+```
+
+## Fallback: poll the explorer
+
+The SSE stream is the recommended path. The polling examples below
+remain accurate for clients that can't open long-lived connections
+(e.g. some serverless platforms).
+
+### Poll for new blocks
 
 ```python
 import requests, time
@@ -36,7 +90,6 @@ last_height = 0
 while True:
     s = requests.get('https://chat.waveledger.net/api/explorer/stats').json()
     if s['height'] > last_height:
-        # New block(s) — fetch them
         for h in range(last_height + 1, s['height'] + 1):
             b = requests.get(f'https://chat.waveledger.net/api/explorer/block/{h}').json()
             print(f"block {h}: {b['tx_count']} txs")
@@ -47,13 +100,7 @@ while True:
 For mainnet (60s block times) `sleep(5)` is plenty. For testnet (5s
 blocks) `sleep(1-2)` to catch every block.
 
-### Use the dashboard locally
-
-If you run a local node, the dashboard's `/api/blocks` endpoint serves
-the same data instantly from in-memory cache, no network hop. Useful
-for indexers that need block-by-block coverage.
-
-## New contract receipts: poll
+### Poll a specific receipt
 
 After submitting a deploy or call, poll the receipt endpoint:
 
@@ -105,8 +152,10 @@ warrant WebSockets. There's no roadmap item to add them yet.
 
 | Feature | Status |
 |---|---|
-| `block-mined` SSE event | Planned — straightforward extension of the existing pumper |
-| `tx-confirmed` SSE event | Planned — same |
-| Per-address SSE filter | Planned — server-side filter |
+| `block` SSE event | Shipped |
+| `tx` SSE event | Shipped |
+| `receipt` SSE event | Shipped |
+| Per-address SSE filter | Shipped |
+| Per-type SSE filter | Shipped |
 | `eth_subscribe`-style WS | Not planned |
 | Webhook (HTTP POST on event) | Considering |

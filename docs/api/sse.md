@@ -1,14 +1,16 @@
 # Server-Sent Events
 
-The chat dApp pushes new messages to connected clients via a standard
-SSE (Server-Sent Events) stream. Use this when you want a live feed
-without polling.
+The messenger pushes every chain-side state change to connected clients
+via a standard SSE stream — new blocks, new transactions of any kind,
+chat messages, and contract receipts. Optional server-side filtering by
+event type and by address keeps client code simple.
 
 ## GET /api/stream
 
 Returns a `text/event-stream` response. The connection stays open
-indefinitely; the server emits events as new messages land in the
-mempool or get confirmed.
+indefinitely; the server emits an event for every new block at the tip,
+every confirmed transaction, every chat message landing in the mempool
+or getting confirmed, and every contract receipt.
 
 ### Required headers
 
@@ -34,12 +36,27 @@ data: {"type":"message","msg":{...}}
 data: {"type":"message","msg":{...}}
 ```
 
+### Query params (optional filters)
+
+| Param | Format | Effect |
+|---|---|---|
+| `types` | comma-separated subset of event types | Only emit events of these types. Unknown values are silently ignored. |
+| `address` | 32-char chain-layer hex OR 40-char VM hex | Only emit events that touch this address (as sender / recipient / miner / contract / message author). Case-insensitive. |
+
+Both filters are AND'd. Omit both to receive everything.
+
+Examples:
+
+```text
+GET /api/stream?types=block
+GET /api/stream?types=tx,receipt&address=34378b1ba5be9d0999acd60be3a8a1f1
+```
+
 ### Event types
 
 #### `message`
 
-A new message appeared in the mempool, OR an existing pending message
-was confirmed. The `msg` payload matches what
+A chat-shaped tx (data dict carries `memo`). Payload mirrors what
 [`GET /api/messages`](chat.md#get-apimessages) returns:
 
 ```json
@@ -47,18 +64,89 @@ was confirmed. The `msg` payload matches what
   "type": "message",
   "msg": {
     "sender": "alice",
-    "address": "34378b1b...",
+    "sender_address": "34378b1b...",
+    "address": "39848b50...",
     "text": "hello",
     "timestamp": 1780002999.123,
-    "status": "pending",
-    "block": null,
+    "status": "confirmed",
+    "block": 1042,
     "tx_id": "abc123..."
   }
 }
 ```
 
-The same `tx_id` will emit again with `status: "confirmed"` once mined.
-Clients should de-duplicate on `(tx_id, status)`.
+#### `tx`
+
+Any confirmed non-message transaction (transfer, contract deploy,
+contract call):
+
+```json
+{
+  "type": "tx",
+  "tx": {
+    "tx_id": "...",
+    "sender": "34378b1b...",
+    "recipient": "contract",
+    "kind": "call",
+    "to": "0x39c1a47bf68d0e2d9c43caaa10c1b2f3c4d5e6f7",
+    "selector": 2,
+    "arg_count": 1,
+    "amount": 0,
+    "fee": 0.01,
+    "timestamp": 1780002999.0,
+    "block_height": 1042
+  }
+}
+```
+
+#### `block`
+
+A new block landed at the tip. One event per height; the SSE pumper
+catches up across multiple new blocks if needed.
+
+```json
+{
+  "type": "block",
+  "block": {
+    "height": 1042,
+    "hash": "0000ab12...",
+    "previous_hash": "0000fc99...",
+    "timestamp": 1780002999.0,
+    "tx_count": 3,
+    "miner": "dc66f82c048f35144599737ed54ab702",
+    "difficulty": 4,
+    "quantum_verified": true
+  }
+}
+```
+
+#### `receipt`
+
+A contract deploy or call produced a receipt. Same shape as
+[Receipt format](../reference/receipt.md), with the originating `tx_id`
+inlined:
+
+```json
+{
+  "type": "receipt",
+  "receipt": {
+    "tx_id": "...",
+    "type": "call",
+    "success": true,
+    "gas_used": 26305,
+    "to": "39c1a47bf68d0e2d9c43caaa10c1b2f3c4d5e6f7",
+    "return_data": "00000000...01",
+    "logs": [],
+    "error": null
+  }
+}
+```
+
+### Dedupe
+
+Each event type has its own server-side dedupe window. Clients should
+still dedupe defensively on `tx_id` (for `message` / `tx` / `receipt`)
+and `height` (for `block`) in case of restart.
 
 ### Example — browser
 
