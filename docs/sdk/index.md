@@ -1,13 +1,17 @@
 # SDK and examples
 
-The official Python SDK ships in the WaveLedger source tree at
-`clients/python/waveledger/`. One `Client` class covers every messenger
-surface plus the SSE event stream. See
-[Python client](python.md) for installation + the full API.
+Two official client libraries ship the same `Client` surface — auth,
+chat, wallet, explorer, playground, admin, and the SSE event stream.
 
-A JavaScript SDK is on the roadmap (the messenger is plain HTTP +
-cookies + SSE, so `fetch` and `EventSource` work today — see the
-[browser examples](javascript.md)).
+| Language | Install | Package |
+|---|---|---|
+| Python | `pip install waveledger-sdk` | [PyPI](https://pypi.org/project/waveledger-sdk/) |
+| Node / browser (TS) | `npm install waveledger-sdk` | [npm](https://www.npmjs.com/package/waveledger-sdk) |
+
+Both are MIT-licensed, dependency-light (Python: just `requests`; Node:
+zero runtime deps), and track the messenger REST API one-to-one. See
+[Python client](python.md) and [JavaScript client](javascript.md) for
+the full surface.
 
 !!! info "Base URL"
 
@@ -28,20 +32,19 @@ cookies + SSE, so `fetch` and `EventSource` work today — see the
 
     ---
 
-    Use the chain's own `crypto`, `core`, and `fourier` modules
-    directly. The most ergonomic option, since the reference impl is
-    Python.
+    `pip install waveledger-sdk`. Uses `requests` under the hood;
+    importable as `from waveledger import Client`.
 
     [:octicons-arrow-right-24: Python client](python.md)
 
--   :material-language-javascript:{ .lg .middle } **JavaScript / browser**
+-   :material-language-javascript:{ .lg .middle } **JavaScript / TypeScript**
 
     ---
 
-    REST + cookies. Wallet signing requires server-side help (ML-DSA-87
-    in browser is on the roadmap via WASM).
+    `npm install waveledger-sdk`. Pure ESM, zero runtime deps, native
+    `fetch` + `ReadableStream`. Works in Node 18+ and modern browsers.
 
-    [:octicons-arrow-right-24: Browser](javascript.md)
+    [:octicons-arrow-right-24: JavaScript client](javascript.md)
 
 -   :material-key:{ .lg .middle } **Signing transactions**
 
@@ -56,8 +59,15 @@ cookies + SSE, so `fetch` and `EventSource` work today — see the
 
     ---
 
-    SSE for chat messages; polling patterns for everything else.
+    SSE for block, tx, message, and receipt events; server-side
+    filtering by type and address.
 
     [:octicons-arrow-right-24: Events](events.md)
 
 </div>
+
+## Release notes
+
+| Version | Date | Notes |
+|---|---|---|
+| `0.1.0` | 2026-05 | Initial release on both registries. Covers messenger, wallet, explorer, playground, admin, and SSE. Pre-1.0; the API tracks the REST surface, which is itself moving. |

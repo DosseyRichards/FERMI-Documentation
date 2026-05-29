@@ -209,3 +209,8 @@ python3 -m pytest tests/ -q
 
 The suite uses a mock `requests.Session` — no network, no fixtures,
 no extra test deps.
+
+## Versioning
+
+Pre-1.0. Method names and response shapes track the REST API. Current
+release: [`waveledger-sdk 0.1.0`](https://pypi.org/project/waveledger-sdk/).
