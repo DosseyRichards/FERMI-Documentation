@@ -183,4 +183,4 @@ npm test         # node:test, 25 tests, no extra deps
 ## Versioning
 
 Pre-1.0. Method names and response shapes track the REST API. Current
-release: [`waveledger-sdk@0.1.0`](https://www.npmjs.com/package/waveledger-sdk).
+release: [`waveledger-sdk@0.1.1`](https://www.npmjs.com/package/waveledger-sdk).
