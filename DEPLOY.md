@@ -14,7 +14,7 @@ This site is built with [MkDocs Material](https://squidfunk.github.io/mkdocs-mat
 
 Bind these in **Project Settings → Domains**:
 
-- `docs.waveledger.net` (primary)
+- `docs.fermi.world` (primary)
 - `docs.fermi.world` (alias)
 
 Add the corresponding `CNAME` records at your DNS provider pointing both names at `cname.vercel-dns.com`.

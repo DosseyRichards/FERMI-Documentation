@@ -1,6 +1,6 @@
 site_name: WaveLedger
 site_description: WaveLedger is the post-quantum Layer-1 by Fermi. API + usage + node operator reference.
-site_url: https://docs.waveledger.net/
+site_url: https://docs.fermi.world/
 edit_uri: ""
 
 docs_dir: docs
@@ -63,9 +63,6 @@ extra:
   generator: false
   alternate:
     - name: WaveLedger Chain Docs
-      link: https://docs.waveledger.net
-      lang: en
-    - name: Fermi Product Docs
       link: https://docs.fermi.world
       lang: en
     - name: Fourier Language

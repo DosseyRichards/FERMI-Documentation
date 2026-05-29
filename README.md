@@ -4,7 +4,7 @@ Source for the WaveLedger chain documentation site.
 
 | Domain | Source dir | Build |
 |---|---|---|
-| `docs.waveledger.net` / `docs.fermi.world` | `docs/` | `mkdocs build` → `site/` |
+| `docs.fermi.world` / `docs.fermi.world` | `docs/` | `mkdocs build` → `site/` |
 
 Built with [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) and deployed via Vercel.
 
