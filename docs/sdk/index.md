@@ -70,4 +70,5 @@ the full surface.
 
 | Version | Date | Notes |
 |---|---|---|
+| `0.1.1` | 2026-05 | Metadata bump: package URLs now point at `docs.fermi.world` (the canonical chain-docs host). No behavior changes. |
 | `0.1.0` | 2026-05 | Initial release on both registries. Covers messenger, wallet, explorer, playground, admin, and SSE. Pre-1.0; the API tracks the REST surface, which is itself moving. |

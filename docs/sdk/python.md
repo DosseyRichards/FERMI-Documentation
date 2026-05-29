@@ -213,4 +213,4 @@ no extra test deps.
 ## Versioning
 
 Pre-1.0. Method names and response shapes track the REST API. Current
-release: [`waveledger-sdk 0.1.0`](https://pypi.org/project/waveledger-sdk/).
+release: [`waveledger-sdk 0.1.1`](https://pypi.org/project/waveledger-sdk/).
