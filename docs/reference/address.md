@@ -1,9 +1,9 @@
 # Address format
 
-WaveLedger has **two address spaces**: chain-layer wallet addresses
-(16 bytes) and VM-layer addresses (20 bytes). They are connected by a
-deterministic bridge function. Knowing which space you are in matters
-whenever you cross the boundary between a transaction and a contract.
+WaveLedger defines **two address spaces**: chain-layer wallet addresses
+(16 bytes) and VM-layer addresses (20 bytes), connected by a
+deterministic bridge function. The active space is significant whenever
+data crosses the boundary between a transaction and a contract.
 
 ## Chain-layer (wallet) addresses
 
@@ -34,8 +34,8 @@ address).
 | Used in | All contract code, storage keys, log envelopes, precompile dispatch |
 | Storage | `vm/state.py` indexes accounts by 20-byte `bytes` |
 
-Why 20 bytes? It matches EVM ergonomics so existing tooling and
-calldata conventions translate directly.
+20-byte VM addresses match EVM ergonomics, allowing existing tooling
+and calldata conventions to translate directly.
 
 ## Bridging: wallet → VM
 
@@ -48,12 +48,12 @@ SHA3-256(wallet_address_utf8)[:20]
 ```
 
 This is a pure function — the same wallet address always maps to the
-same VM address. It is **not** invertible: given a VM address, you
-cannot recover the wallet address.
+same VM address. It is **not** invertible: given a VM address, the
+wallet address cannot be recovered.
 
-If a `str` is already 40 hex chars (optionally `0x`-prefixed), it is
-treated as a literal 20-byte address (identity). Anything else passes
-through the SHA3-256 mapping.
+A `str` already 40 hex chars long (optionally `0x`-prefixed) is treated
+as a literal 20-byte address (identity). Any other input passes through
+the SHA3-256 mapping.
 
 ## Contract addresses
 
@@ -68,15 +68,15 @@ contract_address = SHA3-256(deployer_20b || nonce.to_bytes(32, "big"))[:20]
 - `nonce` is the deployer's VM-level account nonce *before* the deploy.
 - Deterministic: two nodes processing the same deploy tx produce the
   same address. No collision recovery — a duplicate address raises
-  `DeploymentCollision` (defensive; near-impossible with monotonic
-  nonces).
+  `DeploymentCollision` (defensive; effectively impossible under
+  monotonic nonces).
 
 See [Receipt format](receipt.md) for how the deploy address surfaces
 on-chain.
 
 ## Sentinel strings
 
-Some address slots in the protocol carry strings that are not real
+Certain address slots in the protocol carry strings that are not real
 addresses. They are matched literally and never derived from any key.
 
 | String | Where | Meaning |
@@ -86,9 +86,9 @@ addresses. They are matched literally and never derived from any key.
 | `"contract"` | `tx.recipient` | Contract deploy or call target |
 | `"0" * 32` | `tx.recipient` | Burn address (convention) |
 
-Real wallet addresses never collide with these because they are
-deterministically derived from a 1568-byte ML-KEM public key and the
-sentinels are short ASCII.
+Real wallet addresses never collide with sentinels: wallet addresses
+are deterministically derived from a 1568-byte ML-KEM public key,
+whereas sentinels are short ASCII.
 
 ## Precompile addresses
 
@@ -121,7 +121,6 @@ Truncation is purely for the UI. APIs always return the full address.
   lowercase on output).
 - A field expecting an address that receives a sentinel string is
   accepted in the slots listed above and rejected everywhere else.
-- A `tx.sender` that is not a sentinel must hash, under SHA3-512, to
-  produce a value whose first 32 hex chars equal the claimed address —
-  enforced indirectly by signature verification against the wallet's
-  public key.
+- A `tx.sender` that is not a sentinel must hash, under SHA3-512, to a
+  value whose first 32 hex chars equal the claimed address — enforced
+  indirectly by signature verification against the wallet's public key.

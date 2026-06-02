@@ -5,7 +5,7 @@ support pagination where it matters.
 
 ## GET /api/explorer/stats
 
-Top-level chain stats. Cheap to call repeatedly — the UI polls this
+Top-level chain stats. Cheap to call repeatedly; the UI polls this
 every few seconds.
 
 ### Response
@@ -66,7 +66,7 @@ Latest blocks, newest first. Paginated.
 
 ## GET /api/explorer/block/{height}
 
-Full block detail, including every transaction (decoded with kind +
+Full block detail, including every transaction (decoded with kind and
 counterparties).
 
 ### Response
@@ -199,8 +199,8 @@ and falls back to the mempool.
 
 ## GET /api/explorer/address/{address}
 
-Lookup an address. Returns the current balance + a paginated list of
-all txs that involve this address (sender or recipient).
+Lookup an address. Returns the current balance and a paginated list
+of all transactions that involve this address (sender or recipient).
 
 ### Query params
 
@@ -237,9 +237,9 @@ all txs that involve this address (sender or recipient).
 }
 ```
 
-`name` is set if the address is a known approved user or the foundation
-address. `is_foundation: true` flags the address that holds the
-[genesis premine](../reference/tokenomics.md#genesis).
+`name` is set if the address is a known approved user or the
+foundation address. `is_foundation: true` flags the address that
+holds the [genesis premine](../reference/tokenomics.md#genesis).
 
-The address argument accepts hex with or without `0x`. The 20-byte
-canonical form (40 hex chars) is what gets returned in responses.
+The address argument accepts hex with or without `0x`. Responses
+return the 20-byte canonical form (40 hex chars).

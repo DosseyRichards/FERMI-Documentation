@@ -1,10 +1,10 @@
 # Concepts
 
 The chain from first principles. Each page is short enough to read in
-one sitting; they build on each other in this order:
+one sitting. They build on each other in this order:
 
 1. [**Post-quantum cryptography**](pqc.md) — why ML-DSA / ML-KEM / SHA3,
-   what they replace, what they don't.
+   what they replace, and what they do not.
 2. [**Blocks and consensus**](blocks.md) — block structure, PoW + QRNG
    attestation, fork resolution.
 3. [**QRNG and entropy**](entropy.md) — why mining requires verifiable

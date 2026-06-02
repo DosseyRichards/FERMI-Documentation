@@ -16,12 +16,12 @@ includes:
 
 Symmetric primitives (AES, SHA-3) are weakened by Grover's algorithm,
 but only quadratically — a 256-bit key becomes "128-bit-equivalent",
-which is still infeasible to brute-force. NIST classifies AES-256 and
+which remains infeasible to brute-force. NIST classifies AES-256 and
 SHA3-512 as PQ Category 5.
 
-A chain that needs to keep proving past transactions valid 40 years
-from now cannot afford to use cryptography that's broken by a quantum
-computer 20 years from now.
+A chain that must keep proving past transactions valid 40 years from
+now cannot afford to use cryptography breakable by a quantum computer
+20 years from now.
 
 ## The primitive set
 
@@ -37,7 +37,7 @@ There are no proprietary primitives in the chain.
 
 ## Sizes
 
-PQ keys + signatures are bigger than classical equivalents. Plan for it.
+PQ keys and signatures are larger than classical equivalents.
 
 | Quantity | Bytes | vs Ed25519 |
 |---|---|---|
@@ -47,37 +47,40 @@ PQ keys + signatures are bigger than classical equivalents. Plan for it.
 | ML-KEM-1024 ciphertext | 1,568 | — |
 
 A transaction with one signature is ~5 KB on the wire. Block size is
-not artificially capped; the only effective limit is
+not artificially capped; the effective limit is
 `MAX_TRANSACTIONS_PER_BLOCK = 100` (network parameter, raisable on
 mainnet).
 
-## What we don't claim
+## Scope and caveats
 
-- **Symmetric crypto** is not post-quantum *replaced* — it's
-  post-quantum *safe* by virtue of being symmetric. AES-256 has 128 bits
-  of quantum security; SHA3-512 has 256 bits of quantum collision
+- **Symmetric crypto** is not post-quantum *replaced* — it is
+  post-quantum *safe* by virtue of being symmetric. AES-256 has 128
+  bits of quantum security; SHA3-512 has 256 bits of quantum collision
   resistance.
 
 - **Side-channel resistance** is not in scope. ML-DSA implementations
-  have published timing-attack mitigations; we use the reference
-  Python implementation (`dilithium-py`), which is not hardened.
-  Hardware-backed signing is on the roadmap.
+  have published timing-attack mitigations; the reference Python
+  implementation (`dilithium-py`) is not hardened.
 
 - **Long-term forward secrecy of historical data** depends on the
-  ciphers being unbroken. If ML-DSA is broken in 2055, every tx ever
-  signed becomes forgeable in retrospect. Same caveat applies to every
-  signature scheme ever invented.
+  ciphers remaining unbroken. If ML-DSA is broken in 2055, every
+  transaction ever signed becomes forgeable in retrospect. The same
+  caveat applies to every signature scheme ever invented.
+
+### Future extensions
+
+Hardware-backed signing.
 
 ## Crypto agility
 
-The chain has a runtime **signature scheme registry** — see
+The chain provides a runtime **signature scheme registry** — see
 [`verify_sig(scheme, ...)`](https://fourier.fermi.world/language/cross-contract/)
 in Fourier and [`SLH-DSA-SHA2-128s`](../reference/crypto.md#slh-dsa)
-as the second registered scheme. Contracts can choose which scheme to
+as the second registered scheme. Contracts select which scheme to
 require, and new schemes can be added without a hard fork.
 
-The intent is that if any one scheme is broken or deprecated, the chain
-keeps running on the others while we migrate.
+The intent: if any single scheme is broken or deprecated, the chain
+keeps running on the others during migration.
 
 ## Further reading
 

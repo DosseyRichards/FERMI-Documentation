@@ -33,7 +33,7 @@ session-key establishment between nodes.
 | Shared secret | 32 bytes |
 | Security level | NIST 5 |
 
-Used today: as the public-key material whose SHA3-512 derives a wallet
+Active use: the public-key material whose SHA3-512 derives a wallet
 address. Reserved for future P2P channel encryption.
 
 ## ML-DSA-87 (FIPS 204)
@@ -119,8 +119,8 @@ Examples in code:
 ## QRNG entropy
 
 Block attestations carry 64 bytes (512 bits) of entropy drawn from the
-configured entropy source (drand testnet, or a QRNG device on the
-mainnet roadmap). The seed half (32 bytes) feeds the block header; the
+configured entropy source (drand on testnet, or a QRNG device planned
+for mainnet). The seed half (32 bytes) feeds the block header; the
 proof half is committed by SHA3-512 hash.
 
 | Test | Bound | Constant |
@@ -176,7 +176,7 @@ The wallet keystore is per-node and never leaves the host.
 - No SHA-256 or SHA-512 (SHA-3 only).
 - No BLS, no Schnorr, no Ring signatures.
 
-If a primitive does not appear in this page, it is not used in the
-consensus path. Wallet TLS to the dashboard is the one exception (TLS
-remains classical for browser compatibility); on-chain artifacts are
-fully post-quantum.
+A primitive not listed on this page is not used in the consensus path.
+TLS from a browser to the dashboard is the one exception (TLS remains
+classical for browser compatibility); on-chain artifacts are fully
+post-quantum.

@@ -8,14 +8,14 @@
     https://api.waveledger.net
     ```
 
-    Every path in this section is relative to that base — so
-    `/api/messages` means `https://api.waveledger.net/api/messages`.
+    Every path in this section is relative to that base, so
+    `/api/messages` resolves to `https://api.waveledger.net/api/messages`.
 
     `chat.waveledger.net` and `seed.waveledger.net` resolve to the same
-    Fly machine and serve the same routes; `api.` is the durable name
-    for programmatic clients, while `chat.` is for the dApp UI and
-    `seed.` is what other P2P peers dial. Any of the three works for
-    HTTP clients.
+    Fly machine and serve the same routes. `api.` is the durable name
+    for programmatic clients, `chat.` serves the dApp UI, and `seed.`
+    is the host other P2P peers dial. Any of the three works for HTTP
+    clients.
 
     Self-hosted nodes serve the same routes on `http://localhost:8081`
     by default (override with `--messenger-port`).
@@ -28,10 +28,10 @@ Every WaveLedger node exposes three HTTP APIs:
 | **Explorer** | 8081 (same as messenger) | None | Anyone (public chain data) |
 | **Dashboard** | 8080 (loopback) | API key | Node operator / monitoring |
 
-On the public testnet, the messenger + explorer are reached via
+On the public testnet, the messenger and explorer are reached via
 [`https://api.waveledger.net`](https://api.waveledger.net) (Fly's
-edge does TLS termination + proxies to port 8081). The dashboard
-stays on loopback by default and is reached via `fly ssh console`.
+edge terminates TLS and proxies to port 8081). The dashboard remains
+on loopback by default and is reached via `fly ssh console`.
 
 ## Conventions
 
@@ -50,20 +50,20 @@ Status codes:
 | `404` | Resource not found |
 | `409` | Conflict (name already taken) |
 | `429` | Rate limited |
-| `500` | Server error (file a bug + include the response body) |
+| `500` | Server error (file a bug and include the response body) |
 
-Errors come back as:
+Errors are returned as:
 
 ```json
 { "error": "amount must be > 0" }
 ```
 
-Some errors include extra fields — e.g. `phase: "compile"` on
-playground errors, `hint: "..."` on auth errors.
+Some errors include extra fields, e.g. `phase: "compile"` on
+playground errors and `hint: "..."` on auth errors.
 
 ## Authentication models
 
-Three different auth schemes, one per audience:
+Three distinct auth schemes, one per audience:
 
 | Endpoint family | Auth |
 |---|---|
@@ -82,8 +82,8 @@ See [Authentication](auth.md) for details.
 
     ---
 
-    Address, balance, sign and send txs, encrypted backup download
-    + restore.
+    Address, balance, sign and send transactions, encrypted backup
+    download and restore.
 
     [:octicons-arrow-right-24: Wallet endpoints](wallet.md)
 
@@ -91,8 +91,8 @@ See [Authentication](auth.md) for details.
 
     ---
 
-    Submit chat messages (on-chain), list messages, signup + login
-    flow.
+    Submit chat messages (on-chain), list messages, signup and
+    login flow.
 
     [:octicons-arrow-right-24: Chat endpoints](chat.md)
 

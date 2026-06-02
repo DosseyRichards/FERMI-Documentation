@@ -26,14 +26,15 @@ epoch       = h // HALVING_INTERVAL
 subsidy(h)  = INITIAL_BLOCK_REWARD / (2 ** epoch)
 ```
 
-The subsidy halves every `HALVING_INTERVAL = 2,100,000` blocks. At ~60s
-per block that is approximately 4 years per epoch — matched to
-Bitcoin's halving cadence.
+The subsidy halves every `HALVING_INTERVAL = 2,100,000` blocks. At
+approximately 60 seconds per block, this is approximately 4 years per
+epoch — matched to Bitcoin's halving cadence.
 
-Why 5 WAVE × 2.1M blocks instead of 50 WAVE × 210k? Block time is 10×
-faster than Bitcoin's, so per-block reward and halving interval are
-both scaled by 1/10× to preserve a four-year halving cadence on the
-same 21M cap. The geometric series still sums to 21M:
+The choice of 5 WAVE × 2.1M blocks (rather than 50 WAVE × 210k)
+reflects a block time 10× faster than Bitcoin's: per-block reward and
+halving interval are both scaled by 1/10× to preserve a four-year
+halving cadence under the same 21M cap. The geometric series still
+sums to 21M:
 
 ```text
 sum(2 × INITIAL_BLOCK_REWARD × HALVING_INTERVAL)
@@ -71,7 +72,7 @@ Genesis is constructed deterministically by every node on first boot.
 The sender `"genesis"` is a sentinel string accepted only in block 0.
 The 1M WAVE premine lands at `GENESIS_FOUNDATION_ADDRESS` — a real
 ML-DSA-87-derived foundation address whose private key is held offline
-by the BDFL.
+by the foundation operator.
 
 Every node computes the same genesis hash because every input
 (timestamp, distribution amount, foundation address) is a compile-time
@@ -103,7 +104,7 @@ total_supply = GENESIS_DISTRIBUTION + sum(subsidy(h) for h in 1..tip)
 assert total_supply <= MAX_SUPPLY
 ```
 
-Enforced on every block apply. Past max supply, blocks can still be
+Enforced on every block apply. Beyond max supply, blocks may still be
 mined but the coinbase must be zero (fees only) — otherwise the block
 is rejected.
 
@@ -147,8 +148,8 @@ Hybrid PoS + Proof-of-Hardware design is reserved in code but disabled:
 | `STAKING_REWARD_SHARE` | 10% of block reward |
 | `STAKING_DIFFICULTY_BONUS` | 0.5 leading-zeros reduction |
 
-Stakers will earn the right to mine but **must still produce a valid
-QRNG attestation**; staking is Sybil resistance, not a replacement for
+Stakers earn the right to mine but **must still produce a valid QRNG
+attestation**; staking is Sybil resistance, not a replacement for
 hardware-backed PoW.
 
 ## Mainnet vs testnet
@@ -164,4 +165,4 @@ hardware-backed PoW.
 
 The testnet difficulty cap exists because single-CPU performance-1x VMs
 spiral past difficulty 4 into multi-minute blocks; capping at 4 hex
-zeros keeps blocks at ~1s on shared CPUs.
+zeros keeps blocks at approximately 1 second on shared CPUs.

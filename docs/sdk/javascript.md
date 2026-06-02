@@ -1,7 +1,7 @@
 # JavaScript / Node.js client
 
 The `waveledger` package ships in the source tree at
-`clients/typescript/`. One `Client` class — TypeScript-typed,
+`clients/typescript/`. A single `Client` class — TypeScript-typed,
 ESM-native, dependency-free — runs in Node 18+ and modern browsers
 (Chrome, Safari, Firefox).
 
@@ -82,6 +82,9 @@ ac.admin.block(name, reason?)
 ac.admin.unblock(name)
 ac.admin.inviteCreate({ maxUses })
 ac.admin.inviteRevoke(code)
+ac.admin.tokenCreate({ label, name, scope? })
+ac.admin.tokensList()
+ac.admin.tokenRevoke({ token?, tokenHash? })
 
 // SSE event stream
 for await (const ev of c.subscribe({ types?, address?, signal? })) {
@@ -91,8 +94,8 @@ for await (const ev of c.subscribe({ types?, address?, signal? })) {
 
 ## Filtering events
 
-Server-side filtering — the messenger only sends events that match
-your `types=` / `address=` query:
+Server-side filtering — the messenger only emits events that match the
+`types=` and `address=` query parameters:
 
 ```ts
 for await (const ev of c.subscribe({ types: ["block"] })) {
@@ -146,6 +149,40 @@ try {
 | 429 | `RateLimitedError` |
 | 5xx | `ServerError` |
 
+## API token auth { #api-token-auth }
+
+For CI pipelines and unattended workloads, an administrator can mint
+a Bearer token bound to an approved user. The token's user owns
+contracts deployed or called through it; that user's wallet pays the
+fees.
+
+```ts
+// Operator (one-off):
+const admin = new Client({
+  admin: { user: "admin", password: "PASSWORD" },
+});
+await admin.admin.approve("ci-bot");
+const { token } = await admin.admin.tokenCreate({
+  label: "release-pipeline",
+  name:  "ci-bot",
+});
+console.log(token);                  // wlg_… — save this once
+```
+
+```ts
+// Pipeline:
+const c = new Client({ apiToken: "wlg_…" });
+await c.playground.deploy(source);   // signed under ci-bot's wallet
+```
+
+The raw token is returned once and stored only as its SHA3-256 hash.
+Revocation: `admin.admin.tokenRevoke({ token: "wlg_…" })`.
+
+The TypeScript SDK does not ship a local Fourier compiler in v1.
+Programmatic compilation goes through
+`c.playground.compile(source)`, which is unauthenticated when no
+Bearer token is configured.
+
 ## Browser usage
 
 The client uses `globalThis.fetch` and `ReadableStream`. It runs in
@@ -154,7 +191,7 @@ browser's native fetch streaming.
 
 CORS is handled server-side: the messenger answers preflight `OPTIONS`
 requests and sets `Access-Control-Allow-Origin: *` on every response,
-so cross-origin calls from your dApp work out of the box.
+so cross-origin calls from a dApp work without additional configuration.
 
 ## Persisted sessions
 
@@ -182,5 +219,5 @@ npm test         # node:test, 25 tests, no extra deps
 
 ## Versioning
 
-Pre-1.0. Method names and response shapes track the REST API. Current
-release: [`waveledger-sdk@0.1.1`](https://www.npmjs.com/package/waveledger-sdk).
+Pre-1.0. Method names and response shapes track the REST API. Latest
+release: [`waveledger-sdk@0.2.0`](https://www.npmjs.com/package/waveledger-sdk).

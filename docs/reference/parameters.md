@@ -1,6 +1,6 @@
 # Network parameters
 
-All protocol-level constants in one place. Values are from
+All protocol-level constants. Values are sourced from
 `core/constants.py`.
 
 ## Consensus
@@ -129,8 +129,8 @@ Bits are bitmasked; one node may advertise any combination.
 ## QRNG attestation bounds
 
 Per-block health checks applied by every validator before accepting a
-new block's `quantum_signature`. See `core/constants.py` for the live
-values.
+new block's `quantum_signature`. See `core/constants.py` for the
+authoritative values.
 
 | Test | Bound |
 |---|---|
@@ -166,9 +166,9 @@ See [Crypto primitives](crypto.md) for algorithm details.
 | Salt length | 32 bytes | `SALT_LENGTH` |
 | Nonce length | 12 bytes (GCM standard) | `NONCE_LENGTH` |
 
-The keystore actually uses Argon2id (not PBKDF2) for password
-derivation; the `PBKDF2_*` constants are legacy names retained for
-backwards compatibility with older wallet files. See
+The keystore uses Argon2id (not PBKDF2) for password derivation; the
+`PBKDF2_*` constants are legacy names retained for backwards
+compatibility with older wallet files. See
 `auth/wallet_encryption.py`.
 
 ## Genesis

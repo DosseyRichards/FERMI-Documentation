@@ -1,8 +1,8 @@
 # Self-hosting on a VPS
 
-The bare-VPS path uses systemd + Caddy on Ubuntu 22.04+. Cheaper than
-fly (~$19/mo for the full 3-node setup) at the cost of operating
-systemd yourself.
+The bare-VPS path uses systemd + Caddy on Ubuntu 22.04+. Lower-cost
+than Fly (approximately $19/month for the full 3-node setup) at the
+cost of operating systemd directly.
 
 ## Topology
 
@@ -12,8 +12,8 @@ systemd yourself.
 | 2 | dApp + seed + miner #1 | 443 (chat UI), 18333 (P2P) |
 | 3 | Miner #2 | 18333 (P2P) — optional public, or fully private |
 
-Three $6/mo droplets gets you the whole testnet. The dApp node should
-be the largest (consider $12/mo) since it runs the most services.
+Three $6/month droplets host the full testnet. The dApp node should be
+the largest (consider $12/month) since it runs the most services.
 
 ## Entropy VPS
 
@@ -98,7 +98,7 @@ The script installs deps, opens port 18333, writes a
 
 ## DNS
 
-Same idea as the [fly path](fly.md#dns) but with your VPS IPs:
+Same structure as the [Fly path](fly.md#dns), substituting VPS IPs:
 
 | Type | Name | Value |
 |---|---|---|

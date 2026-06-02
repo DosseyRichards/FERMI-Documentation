@@ -1,6 +1,6 @@
 # SDK and examples
 
-Two official client libraries ship the same `Client` surface — auth,
+Two official client libraries expose the same `Client` surface — auth,
 chat, wallet, explorer, playground, admin, and the SSE event stream.
 
 | Language | Install | Package |
@@ -8,7 +8,7 @@ chat, wallet, explorer, playground, admin, and the SSE event stream.
 | Python | `pip install waveledger-sdk` | [PyPI](https://pypi.org/project/waveledger-sdk/) |
 | Node / browser (TS) | `npm install waveledger-sdk` | [npm](https://www.npmjs.com/package/waveledger-sdk) |
 
-Both are MIT-licensed, dependency-light (Python: just `requests`; Node:
+Both are MIT-licensed, dependency-light (Python: `requests` only; Node:
 zero runtime deps), and track the messenger REST API one-to-one. See
 [Python client](python.md) and [JavaScript client](javascript.md) for
 the full surface.
@@ -50,8 +50,8 @@ the full surface.
 
     ---
 
-    What the canonical tx envelope looks like, what's signed, how to
-    produce a valid signature outside the messenger.
+    The canonical tx envelope, the signed fields, and how to produce a
+    valid signature outside the messenger.
 
     [:octicons-arrow-right-24: Signing](signing.md)
 
@@ -70,5 +70,6 @@ the full surface.
 
 | Version | Date | Notes |
 |---|---|---|
-| `0.1.1` | 2026-05 | Metadata bump: package URLs now point at `docs.fermi.world` (the canonical chain-docs host). No behavior changes. |
-| `0.1.0` | 2026-05 | Initial release on both registries. Covers messenger, wallet, explorer, playground, admin, and SSE. Pre-1.0; the API tracks the REST surface, which is itself moving. |
+| `0.2.0` | 2026-06 | API tokens: `Client(api_token=...)` / `new Client({ apiToken })` for unattended use. Token mint/list/revoke under `admin.token_*`. Python SDK now vendors the Fourier compiler; `client.playground.compile_local(source)` compiles in-process. Construction warns on plain-HTTP credential use to non-loopback hosts. TS SDK validates `Set-Cookie` against the configured `baseUrl` origin. |
+| `0.1.1` | 2026-05 | Metadata bump: package URLs now point at `docs.fermi.world`. No behavior changes. |
+| `0.1.0` | 2026-05 | Initial release on both registries. Covers messenger, wallet, explorer, playground, admin, and SSE. |

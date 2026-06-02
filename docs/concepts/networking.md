@@ -43,16 +43,16 @@ A node finds peers via four mechanisms:
 | **mDNS** | LAN only, opt-in | Multicast service discovery |
 | **PEX (peer exchange)** | After first connection | Gossip from known peers |
 
-UPnP is supported but off by default — when enabled, the node tries to
-open the inbound P2P port through your home router automatically.
+UPnP is supported but off by default. When enabled, the node attempts
+to open the inbound P2P port through the local router automatically.
 
 ## Initial Block Download (IBD)
 
 When a node starts behind on the chain:
 
 1. Pick the peer with the highest reported `best_height`.
-2. Request 2,000-header batches via `GETHEADERS` until you reach their
-   tip.
+2. Request 2,000-header batches via `GETHEADERS` until reaching the
+   peer's tip.
 3. Verify each header's PoW + difficulty.
 4. Once headers are fully downloaded, request 500-block batches via
    `GETDATA` (full bodies).
@@ -61,19 +61,20 @@ When a node starts behind on the chain:
 During IBD the miner is paused. After IBD the chain is "synced" and
 mining resumes.
 
-Headers-first means a malicious peer can't waste bandwidth feeding you
-bad blocks — you reject bad headers cheaply before requesting bodies.
+Headers-first means a malicious peer cannot waste bandwidth feeding
+bad blocks — the node rejects bad headers cheaply before requesting
+bodies.
 
 ## Transaction propagation
 
-When a tx enters the mempool (either user-submitted via JSON-RPC or
-received from a peer), the receiving node broadcasts an `INV` of type
-`TX` with the tx_id to all its peers. Peers that don't already have
-the tx respond with `GETDATA`, the originator sends the full tx, peers
-validate + add to their own mempool + re-broadcast.
+When a transaction enters the mempool (either user-submitted via
+JSON-RPC or received from a peer), the receiving node broadcasts an
+`INV` of type `TX` with the tx_id to all its peers. Peers that do not
+already have the transaction respond with `GETDATA`, the originator
+sends the full transaction, and peers validate, add to their own
+mempool, and re-broadcast.
 
-This is the standard "Bitcoin-style" gossip — flooding with INV
-deduplication.
+This is standard Bitcoin-style gossip: flooding with INV deduplication.
 
 ## Block propagation
 
@@ -81,12 +82,12 @@ When a block is mined or received:
 
 1. Local node: `add_validated_block(block)`.
 2. Send `INV` of type `BLOCK` to all peers (the new block's hash).
-3. Peers that don't have it send `GETDATA`.
+3. Peers that lack it send `GETDATA`.
 4. Originator sends the full block.
 5. Peers validate via `validate_received_block`, add, re-propagate.
 
-If two peers race to send you the same block, you fetch from whichever
-GETDATA returns first and ignore the second.
+If two peers race to send the same block, the node fetches from
+whichever GETDATA returns first and ignores the second.
 
 ## Fork resolution
 
@@ -126,7 +127,7 @@ External miners can bootstrap to the public seed:
 seed.waveledger.net:18333
 ```
 
-Add this to your node's `bootstrap_nodes` list:
+Add this to the node's `bootstrap_nodes` list:
 
 ```toml
 [discovery]
@@ -134,5 +135,5 @@ bootstrap_nodes = ["seed.waveledger.net:18333"]
 ```
 
 The seed node accepts inbound P2P from anywhere on the internet over
-TCP. Behind the scenes that's the public chat dApp's P2P listener
-exposed via fly's dedicated IPv4.
+TCP. It is the public chat dApp's P2P listener exposed via Fly's
+dedicated IPv4.

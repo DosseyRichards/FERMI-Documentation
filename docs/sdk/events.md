@@ -1,8 +1,8 @@
 # Subscribing to events
 
 WaveLedger exposes a single SSE stream that pushes **every** chain-side
-state change — new blocks, every confirmed transaction, chat messages,
-and contract receipts. Server-side filtering by event type and address
+state change — new blocks, confirmed transactions, chat messages, and
+contract receipts. Server-side filtering by event type and address
 keeps client code small.
 
 See [Server-Sent Events](../api/sse.md) for the full endpoint spec.
@@ -57,7 +57,7 @@ with requests.get(
 ```
 
 The `address` filter matches sender, recipient, `to`, contract address,
-miner, and message author. Combine with `types=` to narrow further:
+miner, and message author. Combine with `types=` to narrow:
 
 ```text
 /api/stream?types=tx,receipt&address=<addr>
@@ -78,8 +78,8 @@ with requests.get(
 ## Fallback: poll the explorer
 
 The SSE stream is the recommended path. The polling examples below
-remain accurate for clients that can't open long-lived connections
-(e.g. some serverless platforms).
+apply to clients that cannot open long-lived connections (e.g. some
+serverless platforms).
 
 ### Poll for new blocks
 
@@ -97,8 +97,8 @@ while True:
     time.sleep(2)
 ```
 
-For mainnet (60s block times) `sleep(5)` is plenty. For testnet (5s
-blocks) `sleep(1-2)` to catch every block.
+For mainnet (60s block times), `sleep(5)` is sufficient. For testnet
+(5s blocks), use `sleep(1-2)` to catch every block.
 
 ### Poll a specific receipt
 
@@ -124,7 +124,7 @@ Same pattern — poll `/api/mempool` (dashboard, local only) or
 
 ## Address activity: poll
 
-For watching when a specific address receives or sends:
+To watch when a specific address receives or sends:
 
 ```python
 last_tx_count = 0
@@ -140,15 +140,15 @@ while True:
 
 ## Why no WebSockets?
 
-The testnet uses SSE for the one stream that needs it (chat) because
-SSE is half the complexity of WebSockets, works through every CDN
-without special config, has auto-reconnect built into browsers, and
-fits a one-way push perfectly.
+The testnet uses SSE for the one stream that requires it (chat). SSE
+has half the complexity of WebSockets, works through every CDN without
+special configuration, has auto-reconnect built into browsers, and
+fits a one-way push pattern.
 
-Bidirectional channels (which the chain currently doesn't need) would
-warrant WebSockets. There's no roadmap item to add them yet.
+Bidirectional channels would warrant WebSockets. The chain has no
+requirement for them in v1.
 
-## Roadmap
+## Future extensions
 
 | Feature | Status |
 |---|---|
@@ -158,4 +158,4 @@ warrant WebSockets. There's no roadmap item to add them yet.
 | Per-address SSE filter | Shipped |
 | Per-type SSE filter | Shipped |
 | `eth_subscribe`-style WS | Not planned |
-| Webhook (HTTP POST on event) | Considering |
+| Webhook (HTTP POST on event) | Under consideration |

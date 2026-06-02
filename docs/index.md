@@ -7,43 +7,43 @@ hide:
 
 # WaveLedger
 
-A post-quantum Layer-1 blockchain built on the current **NIST PQC
-standards**: every transaction is signed with **ML-DSA-87**
-(NIST FIPS 204), every key exchange uses **ML-KEM-1024** (FIPS 203),
-every hash is **SHA3-512** (FIPS 202). No classical cryptography
-anywhere in the chain.
+A post-quantum Layer-1 blockchain. Every transaction is signed with
+**ML-DSA-87** (NIST FIPS 204). Every key exchange uses **ML-KEM-1024**
+(FIPS 203). Every hash is **SHA3-512** (FIPS 202). No classical
+cryptography sits in the consensus path.
 
-**Designed to stay current.** Post-quantum standards are young; the
-chain is built to evolve with them. Signature schemes are dispatched
-through a runtime registry, entropy sources are versioned by tag, and
-new PQC primitives plug in as precompiles — no hard fork, no
-coordinated chain halt, no rip-and-replace migration. Adding a new
-NIST-standardized scheme is a node release, not a chain split. See
-[Crypto agility](concepts/agility.md) for what's already swappable
-today.
+Cryptographic schemes are dispatched through an on-chain registry,
+entropy sources are catalogued in a typed allow-list, and additional
+PQC primitives plug in as precompile addresses. Adding a NIST-standard
+scheme is a node release coordinated through governance; it is not a
+chain split.
 
-Mining requires a verifiable entropy attestation — the testnet uses the
-[drand](https://drand.love) federated beacon, with a vendor-agnostic
-contract that lets us swap in QRNG hardware (or any other source) without
-forking the chain.
+Mining requires a verifiable attestation that the block's entropy came
+from a registered source. The public testnet uses the
+[drand](https://drand.love) federated beacon today through a
+vendor-agnostic contract; hardware QRNG and additional sources land
+through the same registry path. See
+[Crypto agility](concepts/agility.md) for what is swappable today and
+[Source registry](concepts/entropy.md#source-registry) for the
+enforcement model.
 
-[Live testnet :material-arrow-right:](https://chat.waveledger.net){ .md-button .md-button--primary }
+[Public testnet :material-arrow-right:](https://chat.waveledger.net){ .md-button .md-button--primary }
 
-## Install the SDK
+## SDK
 
 ```bash
 pip install waveledger-sdk        # PyPI
 npm  install waveledger-sdk        # npm
 ```
 
-One `Client` class covers every messenger surface (auth, chat, wallet,
-explorer, playground, admin) plus the SSE event stream. Both libraries
-default to `https://api.waveledger.net`. See
-[SDK and examples](sdk/index.md) for the full API.
+A single `Client` covers every messenger surface — auth, chat, wallet,
+explorer, playground, admin — plus the SSE event stream. Both libraries
+default to `https://api.waveledger.net`. See [SDK](sdk/index.md) for
+the full surface.
 
 ---
 
-## What's in these docs
+## Documentation map
 
 <div class="grid cards" markdown>
 
@@ -51,84 +51,85 @@ default to `https://api.waveledger.net`. See
 
     ---
 
-    The chain from first principles — post-quantum crypto, block
-    structure, mining + entropy, economics, addresses, networking.
+    Post-quantum cryptography, block structure, mining and entropy,
+    economics, addresses, networking.
 
-    [:octicons-arrow-right-24: Read the concepts](concepts/index.md)
+    [:octicons-arrow-right-24: Concepts](concepts/index.md)
 
 -   :material-api:{ .lg .middle } **API Reference**
 
     ---
 
     Every public REST endpoint: wallet, chat, contract playground,
-    explorer, admin. With request/response examples for each.
+    explorer, admin. Request and response shapes for each.
 
-    [:octicons-arrow-right-24: Browse the API](api/index.md)
+    [:octicons-arrow-right-24: API](api/index.md)
 
 -   :material-server:{ .lg .middle } **Running a node**
 
     ---
 
-    Run your own miner, seed, or entropy aggregator. Fly.io and
-    bare-VPS guides. Operational runbook for production.
+    Miner, seed, and entropy aggregator deployments. Fly.io and
+    bare-VPS guides. Operational runbook.
 
-    [:octicons-arrow-right-24: Node operator guide](nodes/index.md)
+    [:octicons-arrow-right-24: Operator guide](nodes/index.md)
 
--   :material-code-braces:{ .lg .middle } **SDK and examples**
+-   :material-code-braces:{ .lg .middle } **SDK**
 
     ---
 
-    Send WAVE, deploy contracts, subscribe to events — from Python
-    and from the browser. Working snippets, not just signatures.
+    Send WAVE, deploy contracts, subscribe to events from Python and
+    TypeScript. Tested snippets for each call.
 
-    [:octicons-arrow-right-24: Get coding](sdk/index.md)
+    [:octicons-arrow-right-24: SDK](sdk/index.md)
 
 -   :material-file-document:{ .lg .middle } **Reference**
 
     ---
 
     Wire formats for blocks, transactions, receipts, addresses;
-    network parameters; the full crypto primitive list.
+    network parameters; the PQC primitive catalogue.
 
-    [:octicons-arrow-right-24: Format specs](reference/index.md)
+    [:octicons-arrow-right-24: Format specifications](reference/index.md)
 
 -   :material-script-text-outline:{ .lg .middle } **Fourier (smart contracts)**
 
     ---
 
-    The smart-contract language gets its own site —
+    The smart-contract language has its own site at
     [fourier.fermi.world](https://fourier.fermi.world).
 
-    [:octicons-arrow-right-24: Fourier docs](https://fourier.fermi.world)
+    [:octicons-arrow-right-24: Fourier](https://fourier.fermi.world)
 
 </div>
 
 ---
 
-## Five-minute orientation
+## Parameters at a glance
 
 | Property | Value |
 |---|---|
-| Consensus | Proof-of-Work with mandatory QRNG attestation |
-| Block time | 60s (mainnet), 5s (testnet) |
-| Block reward | 5 WAVE, halves every 2,100,000 blocks (~4 yrs) |
-| Max supply | 21,000,000 WAVE |
-| Genesis premine | 1,000,000 WAVE to foundation address |
+| Consensus | Proof-of-Work with mandatory entropy attestation |
+| Block time | 60s mainnet target, 5s testnet |
+| Block reward | 5 WAVE; halves every 2,100,000 blocks |
+| Maximum supply | 21,000,000 WAVE |
+| Genesis allocation | 1,000,000 WAVE to the foundation address |
 | Signature scheme | ML-DSA-87 (NIST FIPS 204) |
-| Key exchange | ML-KEM-1024 (NIST FIPS 203) |
-| Hash function | SHA3-512 |
-| Address length | 20 bytes (hex without `0x` prefix) |
-| Smart contract VM | Stack-based, EVM-flavored, post-quantum precompiles |
-| Smart contract language | [Fourier](https://fourier.fermi.world) |
+| Key encapsulation | ML-KEM-1024 (NIST FIPS 203) |
+| Hash function | SHA3-512 (NIST FIPS 202) |
+| Address length | 20 bytes, lowercase hex without `0x` prefix |
+| Smart-contract VM | Stack-based, 256-bit words, post-quantum precompiles |
+| Smart-contract language | [Fourier](https://fourier.fermi.world) |
 
-## What WaveLedger is not
+## Design boundaries
 
-- **Not a fork of anything.** The VM is original; the language is
-  original; the consensus client is original Python.
-- **Not "Bitcoin with PQC bolted on."** Every primitive in the chain
-  was selected for PQ safety from the start.
-- **Not production-ready.** This is a testnet. The mainnet design is
-  documented, but not running.
-- **Not anti-Ethereum.** The smart-contract VM borrows liberally from
-  EVM ergonomics, because EVM ergonomics work. Where we differ from
-  EVM, it's documented.
+- **Original implementation.** The VM, the language, and the consensus
+  client are written from scratch.
+- **Post-quantum from the consensus root.** Every primitive in the
+  chain was selected for PQ safety; classical cryptography is not used
+  to sign blocks, transactions, or P2P messages.
+- **Public testnet today.** A mainnet specification is published; the
+  mainnet network is not yet live.
+- **EVM-aligned VM ergonomics.** The smart-contract VM borrows
+  liberally from EVM where the ergonomics are well-understood;
+  deviations are documented in the Fourier reference.

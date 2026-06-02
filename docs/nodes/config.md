@@ -4,8 +4,8 @@ WaveLedger reads configuration from a TOML file passed via
 `--config <path>`. Anything not in the file falls back to either CLI
 flags or compile-time defaults from `core/constants.py`.
 
-The full schema is below. All sections optional; common defaults are
-sensible.
+The full schema is below. All sections are optional; defaults apply
+to any key not specified.
 
 ## `[node]`
 
@@ -61,7 +61,8 @@ sensible.
 
 ## Env vars
 
-A handful of settings are pulled from env vars (cannot be in the TOML):
+The following settings are read from environment variables and cannot
+be set in the TOML file:
 
 | Env var | Used by | Default |
 |---|---|---|
@@ -152,12 +153,12 @@ bootstrap_nodes       = []
 
 [dashboard]
 enabled = true
-host    = "0.0.0.0"           # expose locally for browsing
+host    = "0.0.0.0"           # expose on the LAN for browsing
 
 [messenger]
 enabled = true
 host    = "0.0.0.0"
 
 [security]
-require_auth = false           # ok for local dev only
+require_auth = false           # acceptable for local dev only
 ```

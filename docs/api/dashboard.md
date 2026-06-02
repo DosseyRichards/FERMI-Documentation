@@ -1,11 +1,11 @@
 # Dashboard API (node-local)
 
 The dashboard runs on **port 8080** of every node, bound to loopback
-by default (`127.0.0.1`). It exposes monitoring + chain-introspection
-endpoints intended for the operator running the node.
+by default (`127.0.0.1`). It exposes monitoring and
+chain-introspection endpoints intended for the node operator.
 
 For public-facing chain data, use the [Explorer API](explorer.md)
-instead — it has similar coverage and no auth requirement.
+instead. It offers similar coverage with no auth requirement.
 
 ## Reaching the dashboard
 
@@ -17,8 +17,8 @@ curl http://127.0.0.1:8080/api/status
 fly ssh console --config fly.chat.toml -C 'curl -s http://127.0.0.1:8080/api/status'
 ```
 
-If you want it exposed publicly, set `[dashboard].host = "0.0.0.0"`
-in `config.toml` and put a reverse proxy with auth in front. The
+To expose the dashboard publicly, set `[dashboard].host = "0.0.0.0"`
+in `config.toml` and place a reverse proxy with auth in front. The
 [`require_auth`](auth.md#bearer-api-key-dashboard-node-local) flag
 controls whether GET endpoints also require the API key.
 
@@ -26,7 +26,7 @@ controls whether GET endpoints also require the API key.
 
 ### GET /api/status
 
-Quick health check. No auth required even when `require_auth=true`.
+Health check. No auth required even when `require_auth=true`.
 
 ```json
 {
@@ -42,7 +42,7 @@ Quick health check. No auth required even when `require_auth=true`.
 
 ### GET /api/node
 
-Node identity + uptime.
+Node identity and uptime.
 
 ```json
 {
@@ -80,12 +80,12 @@ Look up a block by height (`"42"`) or by hash (`"0000ab12..."`).
 
 ### GET /api/tx/{tx_id}
 
-Look up a tx by id, with full data including the raw `data` field
-(deploy bytecode, call calldata, etc.).
+Look up a transaction by id, with full data including the raw `data`
+field (deploy bytecode, call calldata, etc.).
 
 ### GET /api/address/{address}
 
-Address detail with balance + tx history.
+Address detail with balance and transaction history.
 
 ### GET /api/mempool
 
@@ -162,7 +162,7 @@ List connected peers.
 
 ### GET /api/fee {#fee-estimation}
 
-Fee estimation based on mempool depth + recent block contents.
+Fee estimation based on mempool depth and recent block contents.
 
 ```json
 {
@@ -178,9 +178,10 @@ Fee estimation based on mempool depth + recent block contents.
 
 ### GET /api/search?q=
 
-Heuristic search. If `q` is an integer → block lookup. If long hex →
-tx lookup. Otherwise → address lookup. Returns the same structure as
-the corresponding type-specific endpoint.
+Heuristic search. An integer `q` triggers a block lookup; a long hex
+string triggers a transaction lookup; otherwise the value is treated
+as an address lookup. Returns the same structure as the corresponding
+type-specific endpoint.
 
 ### POST /api/tx/submit
 

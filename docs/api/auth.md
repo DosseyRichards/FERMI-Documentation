@@ -17,9 +17,9 @@ Set when the user logs in via `POST /api/login` (or self-onboards via
 | Lifetime | Persists across node restarts (SQLite-backed) |
 
 Sessions are persisted to SQLite at `{data_dir}/admin.db` via
-[`api/admin_store.py`](admin.md#persistence) — node restarts do **not**
+[`api/admin_store.py`](admin.md#persistence). Node restarts do **not**
 invalidate cookies, drop the pending queue, or void invite codes.
-End users stay logged in across deploys.
+End users remain logged in across deploys.
 
 To attach the cookie from `curl`:
 
@@ -43,9 +43,9 @@ WAVELEDGER_ADMIN_PASSWORD=<your-strong-password>
 ```
 
 If `WAVELEDGER_ADMIN_PASSWORD` is unset, the password defaults to
-the literal string `"change-me-via-env"` — fine for local dev,
-**never** acceptable in production. The node logs a warning on
-startup if the default is in use.
+the literal string `"change-me-via-env"` — acceptable for local
+development, **never** acceptable in production. The node logs a
+warning on startup if the default is in use.
 
 Example:
 
@@ -53,15 +53,15 @@ Example:
 curl -u admin:your-password https://api.waveledger.net/api/admin/pending
 ```
 
-The browser will prompt for credentials when you visit `/admin`. Most
-browsers cache them for the rest of the tab session.
+The browser prompts for credentials on first visit to `/admin`. Most
+browsers cache them for the remainder of the tab session.
 
 ## Bearer API key (dashboard, node-local)
 
 The dashboard runs on port 8080 of every node, bound to loopback
 (`127.0.0.1`) by default. It is **not** reachable from the public
-internet unless you change the bind host or front it with a reverse
-proxy + key check.
+internet unless the bind host is changed or the dashboard is fronted
+by a reverse proxy with a key check.
 
 API key:
 
@@ -69,7 +69,7 @@ API key:
 - Stored at `{data_dir}/api_key.json` with mode `0600`
 - Read by middleware on every dashboard write request
 
-Read endpoints (`GET /api/*`) are public-by-default on the dashboard
+Read endpoints (`GET /api/*`) are public by default on the dashboard
 unless the node was started with `--require-auth`. Write endpoints
 (`POST/PUT/DELETE`) always require:
 
@@ -87,16 +87,16 @@ curl -H "Authorization: Bearer $KEY" \
   http://127.0.0.1:8080/api/mining
 ```
 
-The dashboard's API key is local to that node — it's never broadcast
-to peers and changing it doesn't affect the chain.
+The dashboard's API key is local to that node: it is never broadcast
+to peers, and changing it does not affect the chain.
 
 ## No auth (public chain data)
 
 The explorer endpoints (`/api/explorer/*`) are **unauthenticated** by
-design. Blockchain data is public; pretending otherwise is theater.
+design. Blockchain data is public.
 
-Likewise the signup + login endpoints take no auth (login itself is
-the auth-grant step).
+The signup and login endpoints also take no auth (login itself is the
+auth-grant step).
 
 ## CORS
 
@@ -106,15 +106,14 @@ All JSON responses include:
 Access-Control-Allow-Origin: *
 ```
 
-This is intentional — third-party explorers, monitoring dashboards,
-and SDKs need to be able to read chain data from any origin. No
-preflight handling is included; if you need OPTIONS-preflight support,
-front the node with a reverse proxy that adds it.
+This is intentional: third-party explorers, monitoring dashboards,
+and SDKs must be able to read chain data from any origin. No
+preflight handling is included. For OPTIONS-preflight support, front
+the node with a reverse proxy that adds it.
 
-## Future: signed-message login
+## Future extensions
 
-The roadmap calls for **wallet-signed-nonce** login, where the user
-proves ownership of a private key by signing a server-issued nonce
-with their ML-DSA-87 keypair. That removes the need for server-side
-session storage entirely. Currently blocked on shipping browser-side
-ML-DSA via WASM.
+**Wallet-signed-nonce login.** A user proves ownership of a private
+key by signing a server-issued nonce with the ML-DSA-87 keypair. This
+removes the need for server-side session storage entirely. Blocked on
+shipping browser-side ML-DSA via WASM.

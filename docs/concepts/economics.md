@@ -10,8 +10,8 @@ $$ 1 \text{ WAVE} = 10^{18} \text{ Bohms} $$
 (Named after David Bohm. Bohms are to WAVE what wei is to ETH or
 satoshis are to BTC.)
 
-All on-the-wire amounts in JSON APIs use floats in WAVE units (e.g.
-`0.001` is 1,000,000,000,000,000 Bohms). The contract VM works in
+All on-the-wire amounts in JSON APIs are floats in WAVE units (e.g.
+`0.001` is 1,000,000,000,000,000 Bohms). The contract VM operates in
 Bohms internally; conversion happens at the engine boundary.
 
 ## Block reward
@@ -44,7 +44,7 @@ the including block (added to the coinbase).
 | | Value | Notes |
 |---|---|---|
 | `MEMPOOL_MIN_FEE` | 0.0001 WAVE | Floor — txs below are rejected from mempool |
-| `DEFAULT_TRANSACTION_FEE` | 0.01 WAVE | What the wallet UI uses by default |
+| `DEFAULT_TRANSACTION_FEE` | 0.01 WAVE | Default used by the wallet UI |
 | Contract deploy / call fee | 0.001 WAVE | Charged from sender; `gas_limit * gas_price` |
 | RBF bump | +10% over the existing fee | To replace a same-nonce tx |
 
@@ -62,8 +62,8 @@ Contract execution is metered in gas. Conversion:
 | `GAS_PRICE` | 1,000,000,000 (1 Gwei-equivalent, in Bohms/gas) |
 | Default per-tx fee | `1,000,000 * 1,000,000,000 / 10^18` = **0.001 WAVE** |
 
-The default gas limit is what the [Playground API](../api/playground.md)
-sets when you don't specify one. Specific operations have published
+The default gas limit is the value the [Playground API](../api/playground.md)
+applies when none is specified. Specific operations have published
 costs (see [Reference: Crypto + gas](../reference/crypto.md)):
 
 | Op | Gas |
@@ -83,7 +83,7 @@ Gas left over after execution is **not refunded** in v1.
 
 ## Transaction sizing
 
-For wallet UX, a "typical" tx fits these envelopes:
+A typical transaction fits these envelopes:
 
 | Tx kind | Wire size (est.) | Default fee | Typical gas |
 |---|---|---|---|
@@ -97,14 +97,15 @@ and public key (2,592 bytes if not yet known to the verifier).
 
 ## Mining economics
 
-A block at mainnet's 60s target with 5 WAVE subsidy + occasional fees
-produces ~7,200 WAVE/day to the global miner set. With one miner, that
-miner gets all of it; with N miners, each gets `~5 * (their_hashrate /
-total_hashrate)` WAVE per block in expectation.
+A block at mainnet's 60s target with 5 WAVE subsidy plus occasional
+fees produces ~7,200 WAVE/day to the global miner set. With a single
+miner, that miner receives all of it; with N miners, each receives
+`~5 * (their_hashrate / total_hashrate)` WAVE per block in expectation.
 
-Fee revenue is currently negligible vs subsidy — the chain has plenty
-of empty blocks. As usage grows, fees should grow with it.
+Fee revenue is negligible relative to subsidy at present — the chain
+has many empty blocks. As usage grows, fees grow with it.
 
 After the first halving (~4 years), subsidy drops to 2.5 WAVE/block;
-after the second, 1.25; etc. By halving ~30, subsidy is below the
-dust limit and fees become the only meaningful miner revenue.
+after the second, 1.25; and so on. By halving ~30, subsidy falls
+below the dust limit and fees become the sole meaningful miner
+revenue.

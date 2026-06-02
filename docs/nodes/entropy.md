@@ -6,11 +6,11 @@ The entropy aggregator is a small HTTP service that:
    QRNG hardware, future federated beacons)
 2. XOR-mixes them into a single byte pool
 3. Serves the pool to miners via the chain's standard
-   [REST contract](../concepts/entropy.md#the-rest-contract)
+   [REST contract](../concepts/entropy.md#source-rest-contract)
 
-Run it whenever you don't want to depend on the public testnet
-aggregator (`entropy.waveledger.net`) — for control, for redundancy, or
-because you have your own hardware to plug in.
+Run a local aggregator to avoid dependence on the public testnet
+aggregator (`entropy.waveledger.net`) — for operational control, for
+redundancy, or to integrate dedicated entropy hardware.
 
 ## Run the reference aggregator
 
@@ -19,16 +19,17 @@ because you have your own hardware to plug in.
 python3 qrng_aggregator_service.py --port 8420 --host 0.0.0.0
 ```
 
-That's it. The reference setup wires in drand as the sole source. Miners
-on the same machine can now point at `127.0.0.1:8420`; miners elsewhere
-need the host reachable (firewall + DNS).
+The reference setup wires in drand as the sole source. Miners on the
+same machine can point at `127.0.0.1:8420`; miners elsewhere require
+the host to be reachable (firewall + DNS).
 
-On boot it warms up by fetching a drand round; that takes ~2 seconds.
+On boot the aggregator warms up by fetching a drand round; this takes
+approximately 2 seconds.
 
 ## Endpoints
 
-See [QRNG and entropy → REST contract](../concepts/entropy.md#the-rest-contract)
-for the full surface. Three endpoints:
+See [QRNG and entropy → REST contract](../concepts/entropy.md#source-rest-contract)
+for the full surface. The aggregator exposes three endpoints:
 
 | Endpoint | Use |
 |---|---|
@@ -61,9 +62,9 @@ Each source must implement `async def generate_qrng(num_bits: int)`
 returning a `QRNGResult` (see `quantum/providers/local_qrng_provider.py`
 for the reference impl).
 
-`min_quorum=2` means at least 2 of the configured sources must respond
+`min_quorum=2` requires at least 2 configured sources to respond
 successfully before the aggregator serves output. Failing closed is the
-right default for entropy.
+correct default for entropy.
 
 ## Pool sizing
 
@@ -77,8 +78,8 @@ sources (XOR-mixed).
 | `refill threshold` | 50% | Raise for jittery upstreams |
 | `refill batch` | 32 KB per source | — |
 
-A `performance-1x` fly VM serves ~10 MB/sec of entropy from this pool;
-plenty for any plausible miner count.
+A `performance-1x` fly VM serves approximately 10 MB/sec of entropy
+from this pool, sufficient for any plausible miner count.
 
 ## Running on fly
 
@@ -91,7 +92,7 @@ flyctl deploy --config fly.entropy.toml --ha=false
 flyctl certs add entropy.example.com --config fly.entropy.toml
 ```
 
-Then add DNS pointing `entropy.example.com` at fly. See
+Then add DNS pointing `entropy.example.com` at Fly. See
 [Self-hosting on Fly.io](fly.md) for the full walkthrough.
 
 ## Running on a VPS
@@ -114,6 +115,6 @@ must be in the chain's trust list before its blocks are accepted by
 miners. The testnet trust list includes `aggregator:drand-default` and
 a handful of placeholder IDs.
 
-Running an aggregator for your own miners only is unconstrained — the
-trust list matters only when you want **other people's miners** to
-accept attestations from your source.
+Operating an aggregator for a private set of miners is unconstrained —
+the trust list applies only when **external miners** must accept
+attestations from the source.

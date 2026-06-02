@@ -25,7 +25,7 @@ flowchart TD
 Steps in detail:
 
 1. **Sync gate** — if `sync_state == "syncing"`, sleep 5s and loop.
-   Don't mine on a stale tip.
+   The miner does not mine on a stale tip.
 2. **Entropy fetch** — `qrng_provider.generate_qrng(num_bits=512)`
    returns ≥ 64 bytes. If it fails or returns insufficient bytes, raise
    — no fallback.
@@ -59,11 +59,12 @@ Every mining node has a wallet that receives the coinbase. Two options:
    the local wallet store. The chain's `wallets` dict gets the new
    wallet attached.
 
-2. **Bring your own**. Set `--miner-address <hex>` or
-   `[mining].miner_address` in `config.toml`. The node will refuse to
-   start mining if it doesn't have the private key for that address.
+2. **Operator-supplied key**. Set `--miner-address <hex>` or
+   `[mining].miner_address` in `config.toml`. The node refuses to
+   start mining if it does not have the private key for that address.
 
-For long-running miners, prefer option 2 with a key you control offline.
+For long-running miners, prefer option 2 with an offline-controlled
+key.
 
 ## Difficulty adjustment
 
@@ -75,9 +76,9 @@ Key points:
 - Bound to `[2, 8]` mainnet, `[2, 4]` testnet.
 - Each adjustment is `±1` max — no large jumps.
 
-The testnet cap exists because `performance-1x` Fly VMs can't reasonably
-mine past difficulty 4 (block times explode). On bare metal with GPU
-or ASIC, mainnet's `[2, 8]` range is appropriate.
+The testnet cap exists because `performance-1x` Fly VMs cannot
+reasonably mine past difficulty 4 (block times explode). On bare metal
+with GPU or ASIC, mainnet's `[2, 8]` range is appropriate.
 
 ## Hardware vs hosted mining
 
@@ -89,18 +90,17 @@ Three credible profiles:
 | Bare-metal x86 with rust impl (planned) | $50-200/mo | ms range |
 | ASIC (future) | — | ms range |
 
-The reference implementation is **deliberately Python**, for
-auditability over speed. A miner that wants competitive economics on
-mainnet will use a rewritten PoW search loop.
+The reference implementation is **deliberately Python**, prioritizing
+auditability over speed. Miners targeting competitive economics on
+mainnet rely on a rewritten PoW search loop.
 
-## What the miner doesn't do
+## Out of scope for the miner
 
-- **Doesn't choose contract execution order.** Tx execution is in
+- **Contract execution ordering.** Transaction execution proceeds in
   selection order (fee desc, timestamp asc). No flashbots-style
-  reordering markets in v1.
-- **Doesn't censor.** The chain has no opinion on which txs miners
-  include. Censorship-resistance comes from miner diversity.
-- **Doesn't run the QRNG itself.** The miner is a consumer of the
-  entropy source, not a producer. If you want to also run the
-  source, run [the entropy aggregator](../nodes/entropy.md) as a
-  second service.
+  reordering markets exist in v1.
+- **Censorship.** The chain takes no position on which transactions
+  miners include. Censorship resistance derives from miner diversity.
+- **Running the QRNG.** The miner consumes from the entropy source
+  rather than producing it. To run the source as well, deploy
+  [the entropy aggregator](../nodes/entropy.md) as a second service.

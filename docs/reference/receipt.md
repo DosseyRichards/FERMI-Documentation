@@ -63,7 +63,7 @@ Each entry in `logs`:
 
 | Field | Notes |
 |---|---|
-| `address` | Contract that emitted the log (the currently-executing contract, not `tx.sender`) |
+| `address` | Contract that emitted the log (the executing contract, not `tx.sender`) |
 | `topics` | Up to 4 indexed values; for Fourier events, `topics[0]` is the SHA3-256 event signature hash |
 | `data` | Concatenated non-indexed event arguments, 32 bytes each, no length prefix |
 
@@ -94,9 +94,14 @@ during the deploy).
   bohms, deducted from `tx.fee`.
 - `GAS_PRICE = 10^9` bohms/unit (see `core/contract_engine.py`).
 - `DEFAULT_GAS_LIMIT = 1_000_000`.
-- A tx whose `fee` does not cover `gas_limit × GAS_PRICE` is rejected at
-  mempool admission (`InsufficientFee` exception).
+- A tx whose `fee` does not cover `gas_limit × GAS_PRICE` is rejected
+  at mempool admission (`InsufficientFee` exception).
 - Unused gas is **not** refunded in v1.
+
+### Future extensions
+
+Gas refunds for unused gas are under consideration for a later
+revision.
 
 ## Failure semantics
 

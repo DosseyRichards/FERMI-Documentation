@@ -1,9 +1,9 @@
 # Python client
 
 The `waveledger` package ships in the source tree at
-`clients/python/waveledger/`. One `Client` class wraps every messenger
-surface (auth, chat, wallet, explorer, playground, admin) plus the SSE
-event stream.
+`clients/python/waveledger/`. A single `Client` class wraps every
+messenger surface (auth, chat, wallet, explorer, playground, admin)
+plus the SSE event stream.
 
 !!! info "Base URL"
 
@@ -18,7 +18,7 @@ pip install waveledger-sdk
 ```
 
 The PyPI distribution is `waveledger-sdk`; the importable module is
-`waveledger`. Your code stays `from waveledger import Client`.
+`waveledger`. Imports remain `from waveledger import Client`.
 
 From the WaveLedger source tree:
 
@@ -28,8 +28,8 @@ cd Fermi-Mining-ASIC-Software
 pip install -e clients/python
 ```
 
-Or vendor `clients/python/waveledger/` directly — it's pure Python
-with one dep (`requests`).
+Or vendor `clients/python/waveledger/` directly — pure Python with one
+dependency (`requests`).
 
 ```bash
 pip install requests
@@ -85,8 +85,9 @@ c.explorer.tx(tx_id)
 c.explorer.address(address)
 
 # Playground (Fourier)
-c.playground.compile(source)            # → {bytecode_hex, abi, errors}
-c.playground.deploy(source)             # → {tx_id, contract_addr}
+c.playground.compile(source)            # server compile → {bytecode_hex, abi}
+c.playground.compile_local(source)      # local compile — no network call
+c.playground.deploy(source)             # → {tx_id, abi}
 c.playground.call(contract=..., method=..., args=[...])
 c.playground.receipt(tx_id)
 c.playground.contracts()
@@ -100,6 +101,9 @@ ac.admin.unblock(name)
 ac.admin.invite_create(max_uses=25)
 ac.admin.invite_revoke(code)
 ac.admin.invites_list()
+ac.admin.token_create(label="ci", name="alice", scope="playground")
+ac.admin.tokens_list()
+ac.admin.token_revoke(token="wlg_...")
 
 # SSE event stream (block / tx / message / receipt)
 for ev in c.subscribe(types=None, address=None):
@@ -108,8 +112,8 @@ for ev in c.subscribe(types=None, address=None):
 
 ## Filtering events
 
-Filtering is **server-side** — the messenger only sends events that
-match your `?types=` and `?address=` filters:
+Filtering is **server-side** — the messenger only emits events that
+match the `?types=` and `?address=` filters:
 
 ```python
 # Every block as it lands
@@ -126,11 +130,11 @@ for ev in c.subscribe(types=["tx", "receipt"],
     print(ev)
 ```
 
-Wrap the loop in `while True: try: ... except ConnectionError: ...` for
-a production indexer — the underlying HTTP connection drops
-occasionally on long-running streams and reconnecting at the SSE level
-is fine because the server's event window covers the last ~1000 IDs
-per type.
+For a production indexer, wrap the loop in
+`while True: try: ... except ConnectionError: ...`. The underlying HTTP
+connection drops occasionally on long-running streams; reconnecting at
+the SSE level is safe because the server's event window covers the
+last ~1000 IDs per type.
 
 ## Errors
 
@@ -160,11 +164,68 @@ except RateLimitedError:
 Every exception carries `.status` (int) and `.payload` (decoded JSON if
 any).
 
+## API token auth { #api-token-auth }
+
+For CI pipelines and other unattended use, an administrator can mint a
+Bearer token bound to an approved user. The token's user owns any
+contracts deployed or called through it; that user's wallet pays the
+fees.
+
+```python
+# Operator side (one-off):
+admin_c = Client("https://api.waveledger.net",
+                 admin=("admin", "PASSWORD"))
+admin_c.admin.approve("ci-bot")   # if not already approved
+out = admin_c.admin.token_create(label="release-pipeline",
+                                  name="ci-bot",
+                                  scope="playground")
+print(out["token"])               # wlg_... — save this once
+```
+
+```python
+# Pipeline side:
+c = Client("https://api.waveledger.net", api_token="wlg_…")
+c.playground.deploy(source)       # signed under ci-bot's wallet
+```
+
+Tokens are stored as their SHA3-256 hash; the raw value is returned
+once and never recoverable. Revocation:
+`admin_c.admin.token_revoke(token="wlg_…")`.
+
+## Local Fourier compile { #local-compile }
+
+The Python package vendors the Fourier compiler at
+`waveledger._fourier`. `compile_local()` runs in-process and returns
+the same shape as the server compile:
+
+```python
+out = c.playground.compile_local("""
+    contract Counter {
+        storage value: uint @ 0;
+        pub fn inc() -> uint { value = value + 1; return value; }
+    }
+""")
+print(out["bytecode_size"], out["abi"]["contract"])
+```
+
+Useful for:
+
+- **CI builds** that produce bytecode artifacts without network access
+- **Local iteration** with no round-trip to the server
+- **Reproducibility** — the vendored compiler is pinned with the SDK
+  release, so a given `waveledger-sdk` version produces byte-identical
+  bytecode regardless of when or where it runs
+
+`compile_local` raises `ValidationError` (status 400, payload
+`{"error": ..., "phase": "compile"}`) for lex, parse, codegen, and ABI
+errors, mirroring the response shape the server returns from
+`compile()`.
+
 ## Persisted sessions
 
-The session cookie is stored on the client's `requests.Session`. If
-you want to resume a session across restarts, save the cookie value
-and pass it back at construction:
+The session cookie is stored on the client's `requests.Session`. To
+resume a session across restarts, save the cookie value and pass it
+back at construction:
 
 ```python
 # First run
@@ -184,10 +245,10 @@ the [admin store](../api/admin.md#persistence)).
 
 ## Building from chain primitives
 
-The Python `Client` covers the messenger API. If you need to talk to
-the chain at a lower level — sign txs offline, read the SQLite DB
-directly, drive the mempool from a script — import the relevant
-modules from the WaveLedger source tree:
+The Python `Client` covers the messenger API. To address the chain at
+a lower level — offline tx signing, direct SQLite DB reads, scripted
+mempool interaction — import the relevant modules from the WaveLedger
+source tree:
 
 ```python
 from crypto.kyber_crypto import WaveLedgerCrypto
@@ -197,7 +258,7 @@ from fourier             import compile_source
 from vm                  import VM, WorldState, Env
 ```
 
-These are the same modules the messenger and miner use; the public
+These are the same modules used by the messenger and miner; the public
 surface is stable per the [reference docs](../reference/index.md).
 
 ## Tests
@@ -207,10 +268,10 @@ cd clients/python
 python3 -m pytest tests/ -q
 ```
 
-The suite uses a mock `requests.Session` — no network, no fixtures,
-no extra test deps.
+The suite uses a mock `requests.Session` — no network, no fixtures, no
+additional test dependencies.
 
 ## Versioning
 
-Pre-1.0. Method names and response shapes track the REST API. Current
-release: [`waveledger-sdk 0.1.1`](https://pypi.org/project/waveledger-sdk/).
+Pre-1.0. Method names and response shapes track the REST API. Latest
+release: [`waveledger-sdk 0.2.0`](https://pypi.org/project/waveledger-sdk/).

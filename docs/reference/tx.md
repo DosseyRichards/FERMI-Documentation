@@ -121,8 +121,8 @@ When a tx is presented (via mempool admission or block validation):
 | `contract` | recipient | Contract deploy or call |
 | `"0" * 32` (`BURN_ADDRESS`) | recipient (convention) | Burn |
 
-A real address never starts with these strings; they are checked
-literally for sentinel-ness.
+A real address never starts with these strings; sentinel detection is
+a literal match.
 
 ## Examples
 
@@ -158,9 +158,9 @@ literally for sentinel-ness.
 }
 ```
 
-(`amount=0` because chat messages don't transfer value; the message
-text is in `data.memo`. The recipient here is the user's own address
-in the dApp — it's effectively a self-tx with a payload.)
+(`amount=0` because chat messages do not transfer value; the message
+text resides in `data.memo`. The recipient is the sender's own address
+in the dApp — effectively a self-tx with a payload.)
 
 ### Coinbase (cannot be submitted; appears at block index 0 of every block)
 
@@ -179,6 +179,6 @@ in the dApp — it's effectively a self-tx with a payload.)
 }
 ```
 
-(`amount = subsidy + collected_fees`. `signature` is the literal string
-`"reward_signature"` — synthetic, validated by structural rule, not
-ML-DSA.)
+(`amount = subsidy + collected_fees`. `signature` is the literal
+string `"reward_signature"` — synthetic, validated by structural rule
+rather than ML-DSA.)

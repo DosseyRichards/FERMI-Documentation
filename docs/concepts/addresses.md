@@ -51,8 +51,8 @@ chain re-derives them from `private_key` / `public_key` on each call.
 
 ## Reserved sentinel addresses
 
-A handful of strings appear as sender/recipient that aren't real
-addresses — they're sentinels the chain knows about:
+Several strings appear as sender/recipient that are not real addresses.
+They are sentinels recognized by the chain:
 
 | Sentinel | Meaning |
 |---|---|
@@ -88,10 +88,10 @@ signature = crypto.sign_transaction(tx_data, private_key, signing_key=signing_ke
 The signature covers only the five fields above (sender, recipient,
 amount, timestamp, fee) — **not** the `data` field. This is deliberate:
 contract-deploy/call data is large (full bytecode), and re-signing on
-every call's calldata change would make hand-signing impractical.
+every change to a call's calldata would make hand-signing impractical.
 
-The integrity of `data` is enforced by `tx_id` (which hashes everything,
-including `data`'s contribution to the canonical envelope).
+The integrity of `data` is enforced by `tx_id`, which hashes the entire
+canonical envelope including `data`.
 
 !!! warning "Don't lose your private key"
     There is no recovery mechanism. Use the [encrypted backup](../api/wallet.md#export)
@@ -99,13 +99,16 @@ including `data`'s contribution to the canonical envelope).
 
 ## Wallet UX in the testnet dApp
 
-The testnet chat dApp generates a wallet for every user when they sign
-up (with or without an invite code). The keypair lives in server
-memory until the user downloads an encrypted backup via
+The testnet chat dApp generates a wallet for every user at signup
+(with or without an invite code). The keypair lives in server memory
+until the user downloads an encrypted backup via
 `POST /api/wallet/export`. See [Wallet API](../api/wallet.md).
 
-The server-side custody model is explicitly **v1**. The roadmap calls
-for browser-side ML-DSA via a WASM port of `dilithium-py`, which would
-make the dApp non-custodial. See the
+The server-side custody model is the v1 specification.
+
+### Future extensions
+
+Browser-side ML-DSA via a WASM port of `dilithium-py` would make the
+dApp non-custodial. See the
 [`project-wallet-backup-crypto`](https://github.com/DosseyRichards/Fermi-Mining-ASIC-Software)
 design note for the AES-256-GCM choice on backup encryption.

@@ -98,7 +98,7 @@ The `quantum_signature` block has this shape (from
 
 | Field | Required | Notes |
 |---|---|---|
-| `version` | yes | Currently `1` |
+| `version` | yes | `1` as of v1 |
 | `entropy_seed` | yes | 32-byte hex, mixed into the block header for PoW |
 | `entropy_proof` | yes | 32-byte hex, the revealed half whose hash matches `commitment` |
 | `commitment` | yes | `SHA3-512(entropy_proof)`, hex |
@@ -107,11 +107,11 @@ The `quantum_signature` block has this shape (from
 | `proof_type` | yes | Versioned tag; future schemes increment this |
 | `health` | yes | Source-specific stats; the four shown are enforced bounds |
 
-`signature` and `public_key` are **not** produced by the current
-implementation — there is no source-side signing path yet. They are
-reserved for a future revision (`proof_type` will increment when it
-ships) where the entropy aggregator signs its responses and the
-validator verifies them against a per-source registered public key.
+`signature` and `public_key` are **not** produced by the v1
+implementation — no source-side signing path exists. They are reserved
+for a future revision (`proof_type` will increment at that time) in
+which the entropy aggregator signs its responses and the validator
+verifies them against a per-source registered public key.
 
 Validation rules — enforced by `mining/attestation.py::verify_attestation`:
 
@@ -126,11 +126,14 @@ Validation rules — enforced by `mining/attestation.py::verify_attestation`:
    Aggregator-composed IDs (`aggregator:a+b+c`) are allowed iff every
    component is itself registered.
 
-Back-compat: v0 blocks lacking a `source` field still verify. Per-source
-signature verification under a registered public key is on the roadmap;
-when it ships, `proof_type` will increment from
-`qrng_hardware_attestation_v1` to `_v2` and the envelope will gain
-outer `signature` and `public_key` fields.
+Back-compat: v0 blocks lacking a `source` field still verify.
+
+### Future extensions
+
+Per-source signature verification under a registered public key is
+planned. At that point, `proof_type` increments from
+`qrng_hardware_attestation_v1` to `_v2`, and the envelope gains outer
+`signature` and `public_key` fields.
 
 ## Genesis block
 
@@ -145,7 +148,7 @@ Genesis (`index=0`) is special:
   `GENESIS_FOUNDATION_ADDRESS`
 - `hash` is deterministic from the above
 
-Every node computes its own genesis block on first boot; they all
+Every node computes its own genesis block on first boot; all nodes
 agree because the inputs are deterministic constants.
 
 ## Validation rules
@@ -163,5 +166,5 @@ A block is accepted iff:
 8. Every other tx passes mempool admission rules
 9. Adding the coinbase would not exceed `MAX_SUPPLY`
 
-Failed validation → block rejected, peer is not punished (could be a
-race), block is not added to the chain.
+Failed validation: block rejected, peer is not punished (failure may
+result from a race), block is not added to the chain.

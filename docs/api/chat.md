@@ -1,8 +1,8 @@
 # Chat / Messenger API
 
-The chat dApp is built on a thin layer over real on-chain transactions:
-every message is an ML-DSA-87-signed transfer of 0 WAVE with the
-message body in `tx.data.memo`. The "chat room" is a view of the chain.
+The chat dApp is a thin layer over on-chain transactions: every
+message is an ML-DSA-87-signed transfer of 0 WAVE with the message
+body in `tx.data.memo`. The "chat room" is a view of the chain.
 
 ## Onboarding
 
@@ -16,8 +16,8 @@ pending queue. An admin manually approves via the [admin API](admin.md).
 **Path B — invite code (instant):** if the request includes a valid
 `invite_code`, the signup is auto-approved on the spot. A wallet is
 generated, the [faucet](../concepts/economics.md) drips 100 WAVE, a
-session cookie is set, and the response carries the login token in
-case the user wants to log in from another device.
+session cookie is set, and the response carries the login token for
+logging in from another device.
 
 #### Request
 
@@ -55,8 +55,8 @@ case the user wants to log in from another device.
 }
 ```
 
-`Set-Cookie: session=...` is sent with this response — the browser
-is already logged in and can redirect to `/chat`.
+`Set-Cookie: session=...` is sent with this response. The browser is
+already logged in and can redirect to `/chat`.
 
 #### Errors
 
@@ -103,7 +103,7 @@ Log in as an approved user using their login token.
 
 ### GET /api/me
 
-Returns the current logged-in user's name + address + balance.
+Returns the current logged-in user's name, address, and balance.
 
 #### Response
 
@@ -115,7 +115,8 @@ Returns the current logged-in user's name + address + balance.
 }
 ```
 
-Used by the UI to populate the header. Returns 401 if no session.
+Used by the UI to populate the header. Returns 401 if no session is
+present.
 
 ---
 
@@ -123,8 +124,8 @@ Used by the UI to populate the header. Returns 401 if no session.
 
 ### POST /api/send
 
-Submit a chat message. Builds a tx, signs it with the user's wallet,
-submits it to the mempool.
+Submit a chat message. The server builds a transaction, signs it with
+the user's wallet, and submits it to the mempool.
 
 #### Request
 
@@ -157,8 +158,8 @@ HTTP/1.1 429 Too Many Requests
 { "error": "rate limit: wait N seconds" }
 ```
 
-The window is per-address; sessions don't matter (so an attacker can't
-just open more sessions to bypass).
+The window is per-address; sessions are not used as the key, so
+opening additional sessions does not bypass the limit.
 
 ---
 
@@ -208,9 +209,9 @@ Returns the most recent messages (confirmed + pending), newest first.
 | `block` | Block height or `null` if pending |
 | `tx_id` | First 16 chars (full id available via `/api/explorer/tx/{id}`) |
 
-Messages are identified by walking the chain backwards looking for
-`tx.data.memo` entries, then prepending the mempool. They're not stored
-in a separate table.
+Messages are identified by walking the chain backwards for
+`tx.data.memo` entries, then prepending the mempool. They are not
+stored in a separate table.
 
 ---
 

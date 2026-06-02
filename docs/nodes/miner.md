@@ -1,11 +1,11 @@
 # Running a miner
 
-A miner produces new blocks. To run one you need:
+A miner produces new blocks. A miner requires:
 
-- A wallet (the miner creates one on first boot if you don't bring your own)
+- A wallet (the miner auto-creates one on first boot if none is supplied)
 - Access to a registered [entropy source](../concepts/entropy.md)
-- A reachable [seed node](seed.md) to bootstrap the chain from (or be one)
-- 1+ CPU core, ~1 GB RAM, ~10 GB disk
+- A reachable [seed node](seed.md) for chain bootstrap (or the miner itself acting as one)
+- 1 or more CPU cores, ~1 GB RAM, ~10 GB disk
 
 ## Install
 
@@ -84,8 +84,8 @@ the current tip, then starts producing blocks.
 
 ## CLI flags
 
-Most things live in the config file; a few are command-line only or
-override the config:
+Most options live in the config file. The following flags are
+command-line only or override the config:
 
 | Flag | Notes |
 |---|---|
@@ -98,39 +98,44 @@ override the config:
 | `--port <int>` | Override `[node].port` |
 | `--no-mdns` | Disable LAN service discovery |
 | `--no-upnp` | Disable UPnP NAT punchthrough |
-| `--no-seeds` | Don't use DNS / hardcoded seed lists |
-| `--no-dashboard` | Don't start the dashboard server |
-| `--no-messenger` | Don't start the messenger server |
+| `--no-seeds` | Disable DNS and hardcoded seed lists |
+| `--no-dashboard` | Disable the dashboard server |
+| `--no-messenger` | Disable the messenger server |
 | `--dashboard-port <int>` | Port for the local dashboard (default 8080) |
 | `--messenger-port <int>` | Port for the messenger (default 8081) |
 | `--require-auth` | Require Bearer API key for all dashboard reads, not just writes |
-| `--relay-only` | Don't mine, just maintain state + serve peers (= run as a seed) |
+| `--relay-only` | Disable mining; maintain state and serve peers (equivalent to running as a seed) |
 
 ## Pointing at a different entropy source
 
 The testnet's public aggregator (`entropy.waveledger.net`) is the
-default. To bring your own:
+default. To use an alternative:
 
-1. Run your own [aggregator](entropy.md) somewhere reachable.
-2. Set `[mining].qrng_host` + `qrng_port` to your aggregator's
-   hostname + port.
-3. The source ID exposed by your aggregator (the `source` field in
-   its `/api/health` response) must be in the chain's trust list,
-   or your blocks will be rejected. The trust list is governance-controlled.
+1. Run a private [aggregator](entropy.md) at a reachable address.
+2. Set `[mining].qrng_host` and `qrng_port` to the aggregator's
+   hostname and port.
+3. The source ID exposed by the aggregator (the `source` field in its
+   `/api/health` response) must be present in the chain's trust list,
+   or blocks from this miner will be rejected. The trust list is
+   governance-controlled.
 
-In v1 the trust list is hardcoded; in v2 it'll be a Fourier contract
-modifiable by the BDFL via Timelock.
+In v1 the trust list is hardcoded.
+
+### Future extensions
+
+In v2 the trust list becomes a Fourier contract modifiable by the
+foundation operator via Timelock.
 
 ## Bring your own miner address
 
-If you have an existing wallet you want to receive rewards into:
+To direct rewards into an existing wallet:
 
 ```bash
 python3 node.py --testnet --mine --miner-address $YOUR_ADDR --config ~/waveledger.toml
 ```
 
-The node will refuse to start if it doesn't have the private key for
-`$YOUR_ADDR`. To register a wallet you control, drop its JSON into
+The node refuses to start if it lacks the private key for
+`$YOUR_ADDR`. To register a controlled wallet, place its JSON into
 `{data_dir}/wallets/` (see [`wallet_cli.py`](https://github.com/DosseyRichards/Fermi-Mining-ASIC-Software/blob/main/wallet_cli.py)).
 
 ## Systemd
@@ -178,14 +183,15 @@ Logs via `journalctl -u waveledger-miner -f`.
 | Entropy reachable | `curl http://127.0.0.1:8080/api/qrng` — `reachable: true` |
 | Recent block | `curl http://127.0.0.1:8080/api/chain` — `tip_timestamp` < 30s ago |
 
-A monitoring loop polling these every 30s catches most failure modes.
+A monitoring loop polling these every 30 seconds catches most failure
+modes.
 
 ## Common issues
 
 | Symptom | Likely cause |
 |---|---|
 | `QRNG: not reachable` | `qrng_host` wrong, or aggregator is down |
-| No peers connecting | Inbound port not open at firewall / NAT; UPnP off and no port-forward |
+| No peers connecting | Inbound port closed at firewall / NAT; UPnP disabled with no port-forward |
 | Mining starts then halts | Difficulty spiral (see [Blocks](../concepts/blocks.md#difficulty-adjustment)); reset chain or wait |
-| Block age growing | Mempool stuck — check entropy is alive; check tx propagation |
-| `insufficient WAVE for deploy fee` (from playground) | Miner wallet has no balance yet; wait for first coinbase |
+| Block age growing | Mempool stuck — verify entropy is alive; verify tx propagation |
+| `insufficient WAVE for deploy fee` (from playground) | Miner wallet has zero balance; wait for first coinbase |

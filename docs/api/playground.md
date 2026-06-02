@@ -1,19 +1,32 @@
 # Playground (contracts) API
 
 Endpoints for compiling Fourier source, deploying it as a contract,
-and calling methods on a deployed contract — all from the browser.
+and calling methods on a deployed contract.
 
-All endpoints require a [session cookie](auth.md#session-cookies-end-users).
-The session's wallet pays all fees + gas; the user needs enough WAVE
-in their wallet (the [signup faucet](../concepts/economics.md) drips
-100 WAVE, which is plenty for ~100,000 contract operations).
+## Authentication
+
+Each endpoint accepts either:
+
+- a [session cookie](auth.md#session-cookies-end-users), or
+- an `Authorization: Bearer wlg_…` [API token](admin.md#api-tokens)
+  scoped to `playground`.
+
+The session cookie (or the token's bound user) determines whose wallet
+pays the fee. If both are presented, the session cookie wins. The
+SDKs construct the right header automatically — see
+[SDK / Python](../sdk/python.md#api-token-auth) and
+[SDK / TypeScript](../sdk/javascript.md#api-token-auth).
+
+The paying wallet must hold sufficient WAVE; the
+[signup faucet](../concepts/economics.md) drips 100 WAVE, sufficient
+for approximately 100,000 contract operations.
 
 ## Compile
 
 ### POST /api/playground/compile
 
-Compile Fourier source to VM bytecode and extract its ABI. No on-chain
-state changes; doesn't cost gas.
+Compile Fourier source to VM bytecode and extract its ABI. No
+on-chain state changes; no gas cost.
 
 #### Request
 
@@ -43,9 +56,9 @@ state changes; doesn't cost gas.
 
 The ABI is extracted by parsing the source with
 [`fourier.fourier_abi.extract_abi`](https://fourier.fermi.world/abi/),
-walking the AST to find every `pub fn` and assigning sequential 1-byte
-selectors starting at `0x01`. See [Fourier ABI](https://fourier.fermi.world/abi/)
-for the encoding.
+walking the AST to find every `pub fn`, and assigning sequential
+1-byte selectors starting at `0x01`. See
+[Fourier ABI](https://fourier.fermi.world/abi/) for the encoding.
 
 #### Errors
 
@@ -60,9 +73,9 @@ for the encoding.
 
 ### POST /api/playground/deploy
 
-Compile + submit a deploy transaction. The contract address is derived
-from the sender + sender's nonce; it's not known until the deploy tx
-is mined.
+Compile and submit a deploy transaction. The contract address is
+derived from the sender and sender's nonce; it is not known until the
+deploy transaction is mined.
 
 #### Request
 
@@ -76,7 +89,7 @@ Optional fields (use defaults if absent):
 |---|---|---|
 | `gas_limit` | 1,000,000 | Max gas the deploy may consume |
 | `value` | 0 | WAVE to credit to the contract at deploy time |
-| `init_calldata` | `""` | Bytes passed to the contract's `init` (Fourier v1: must be empty) |
+| `init_calldata` | `""` | Bytes passed to the contract's `init`. Fourier v1 requires this to be empty. |
 
 #### Response
 
@@ -88,8 +101,9 @@ Optional fields (use defaults if absent):
 }
 ```
 
-The tx is in the mempool. Poll [`GET /api/playground/receipt/{tx_id}`](#receipt)
-to learn the contract address once the block lands (~5 sec testnet).
+The transaction enters the mempool. Poll
+[`GET /api/playground/receipt/{tx_id}`](#receipt) to learn the
+contract address once the block lands (~5 sec testnet).
 
 #### Errors
 
@@ -107,7 +121,8 @@ to learn the contract address once the block lands (~5 sec testnet).
 ### POST /api/playground/call
 
 Submit a call transaction against a deployed contract. The server
-encodes calldata using the contract's ABI (selector + 32-byte args).
+encodes calldata using the contract's ABI (selector plus 32-byte
+arguments).
 
 #### Request
 
@@ -125,7 +140,7 @@ encodes calldata using the contract's ABI (selector + 32-byte args).
 | `contract_addr` | yes | Hex address (with or without `0x`) |
 | `selector` | yes | 1-byte function selector from the ABI |
 | `args` | yes | Argument values in declaration order |
-| `params` | yes | Type info per arg (`[{"name":"to","type":"address"}, ...]`); needed for encoding |
+| `params` | yes | Type info per arg (`[{"name":"to","type":"address"}, ...]`); required for encoding |
 | `gas_limit` | no | Default 1,000,000 |
 | `value` | no | WAVE attached to the call |
 
@@ -151,7 +166,7 @@ encodes calldata using the contract's ABI (selector + 32-byte args).
 
 ### GET /api/playground/receipt/{tx_id} {#receipt}
 
-Returns the receipt for a deploy/call tx, once mined.
+Returns the receipt for a deploy or call transaction once mined.
 
 #### Response — pending
 
@@ -212,7 +227,8 @@ Returns the receipt for a deploy/call tx, once mined.
 
 ### GET /api/playground/contracts
 
-Returns contracts deployed by the current user, with their ABIs.
+Returns contracts deployed by the current user along with their
+ABIs.
 
 #### Response
 
@@ -239,8 +255,8 @@ Pending deploys (block not yet mined) have `contract_addr: null` and
 
 ### GET /api/playground/examples
 
-Returns the bundled example contracts the UI loads from the "Load
-example" dropdown.
+Returns the bundled example contracts that the UI loads from the
+"Load example" dropdown.
 
 #### Response
 
@@ -269,5 +285,5 @@ example" dropdown.
 }
 ```
 
-Examples ship with the testnet build and can be extended by editing
-`api/messenger.py`'s `_PG_EXAMPLES` dict.
+Examples ship with the testnet build and are extended by editing
+the `_PG_EXAMPLES` dict in `api/messenger.py`.

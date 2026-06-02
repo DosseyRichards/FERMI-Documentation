@@ -1,6 +1,6 @@
 # Running a seed node
 
-A seed node serves the chain to new peers but doesn't mine. Useful for:
+A seed node serves the chain to new peers without mining. Use cases:
 
 - Running infrastructure (block explorers, indexers, dApps) without
   reward incentives
@@ -9,7 +9,7 @@ A seed node serves the chain to new peers but doesn't mine. Useful for:
 
 ## Config
 
-Almost identical to a miner; the difference is `--relay-only` or
+Nearly identical to a miner; the difference is `--relay-only` or
 `[mining].enabled = false`:
 
 ```toml
@@ -46,39 +46,40 @@ require_auth = true
 python3 node.py --testnet --relay-only --config ~/seed.toml
 ```
 
-The node syncs the chain, accepts inbound P2P, gossips blocks + txs,
-but never builds blocks itself. No `--mine`, no entropy fetch.
+The node syncs the chain, accepts inbound P2P, and gossips blocks and
+txs, but never builds blocks. No `--mine`, no entropy fetch.
 
 ## Why run one
 
-- **You operate a dApp** and want a local node so user requests don't
+- **dApp operators** benefit from a local node so user requests do not
   cross the open internet for every chain read.
-- **You operate an indexer** (explorer, analytics, alerting) and want
-  reads off a local SQLite.
-- **You want network redundancy** for the testnet without committing
-  to the operational complexity of mining.
+- **Indexer operators** (explorer, analytics, alerting) gain reads
+  served from a local SQLite.
+- **Network redundancy** for the testnet without the operational
+  complexity of mining.
 
-A seed node uses ~1/4 the CPU of a miner and the same disk footprint.
+A seed node consumes approximately 1/4 the CPU of a miner with an
+identical disk footprint.
 
 ## Becoming a public seed
 
-If you want to be discoverable by other miners as a bootstrap option,
-publish your `host:port` somewhere their config can pick up:
+To be discoverable by other miners as a bootstrap option, publish the
+node's `host:port` so other configs can pick it up:
 
-1. Add your address to `TESTNET_SEED_NODES` in `core/constants.py` (PR
+1. Add the address to `TESTNET_SEED_NODES` in `core/constants.py` (PRs
    welcome).
 2. Add an `A`/`AAAA` record under one of the
    `TESTNET_DNS_SEED_HOSTS` domains.
-3. Or just announce your address in Discord / Twitter / the README;
-   most operators will add bootstrap nodes manually anyway.
+3. Or announce the address in Discord, Twitter, or the README; most
+   operators add bootstrap nodes manually.
 
 Inbound P2P must be reachable: firewall open on port 18333, no NAT
 double-translation, no aggressive ISP filtering.
 
 ## Validation-only mode
 
-If you want a node that downloads + validates every block but never
-serves anything (audit-only):
+For a node that downloads and validates every block without serving
+anything (audit-only):
 
 ```toml
 [node]
@@ -93,4 +94,4 @@ python3 node.py --testnet --relay-only --no-mdns --no-upnp --no-seeds \
 ```
 
 The node connects only to the seed, syncs, validates every block, and
-serves nothing back. Useful for verifying chain integrity from cold.
+serves nothing back. Suitable for verifying chain integrity from cold.

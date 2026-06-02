@@ -1,6 +1,6 @@
 # Self-hosting on Fly.io
 
-The reference deployment runs three fly apps:
+The reference deployment runs three Fly apps:
 
 | App | Role | Public? |
 |---|---|---|
@@ -8,15 +8,15 @@ The reference deployment runs three fly apps:
 | `waveledger-chat` | dApp + seed + miner #1 | Yes (HTTPS chat + raw TCP P2P) |
 | `waveledger-miner2` | Miner #2 | No (private) |
 
-Total cost: ~$27/mo (one $25 perf-1x for the chat node, +$2 for the
-dedicated IPv4 the raw-TCP P2P needs).
+Total cost: approximately $27/month (one $25 perf-1x for the chat node
+plus $2 for the dedicated IPv4 required by raw-TCP P2P).
 
 ## Prereqs
 
 - `flyctl` installed (`brew install flyctl` or `curl -L https://fly.io/install.sh | sh`)
-- A fly account (`fly auth signup`)
+- A Fly account (`fly auth signup`)
 - Docker daemon running locally (or accept `--remote-only` for slower builds)
-- A domain you can edit DNS for
+- A domain with editable DNS
 
 ## Deploy
 
@@ -55,11 +55,11 @@ fly certs add entropy.example.com --config fly.entropy.toml
 fly certs add seed.example.com    --config fly.chat.toml
 ```
 
-Each command prints the DNS records you need to set.
+Each command prints the DNS records required for validation.
 
 ## DNS
 
-For three subdomains served at fly:
+For three subdomains served from Fly:
 
 | Type | Name | Value |
 |---|---|---|
@@ -68,9 +68,9 @@ For three subdomains served at fly:
 | A | `seed` | `<dedicated-v4-from-fly-ips-list>` |
 | AAAA | `seed` | `<dedicated-v6-from-fly-ips-list>` |
 
-`seed` needs explicit A/AAAA (not CNAME) because raw TCP can't ride
-on fly's shared SNI-routed IPv4. `chat` and `entropy` are HTTPS, so
-shared IPv4 + CNAME work.
+`seed` requires explicit A/AAAA records (not CNAME) because raw TCP
+cannot ride on Fly's shared SNI-routed IPv4. `chat` and `entropy` use
+HTTPS, so shared IPv4 + CNAME suffices.
 
 Check propagation + cert status:
 
@@ -79,8 +79,8 @@ dig +short chat.example.com
 fly certs check chat.example.com --config fly.chat.toml
 ```
 
-The cert is issued automatically by Let's Encrypt once DNS resolves.
-First-time validation takes 30 sec to a few minutes.
+The certificate is issued automatically by Let's Encrypt once DNS
+resolves. First-time validation takes 30 seconds to a few minutes.
 
 ## Smoke test
 
@@ -124,17 +124,17 @@ fly volumes create waveledger_chat_data \
 fly deploy --config fly.chat.toml --ha=false
 ```
 
-Repeat for miner2 if you want a totally fresh chain. The entropy app
-has no volume — no reset needed.
+Repeat for miner2 to fully reset the chain. The entropy app has no
+volume — no reset is needed.
 
-## Why fly
+## Why Fly
 
 - One-command deploys
 - Auto-issued TLS
 - Private network (`.internal`) between sibling apps with no extra config
-- Anycast — your chat URL feels close everywhere
-- Free shared IPv4 for HTTPS apps; cheap dedicated IPv4 for raw TCP
+- Anycast routing — low-latency chat URL globally
+- Free shared IPv4 for HTTPS apps; low-cost dedicated IPv4 for raw TCP
 
-The same setup works on Render, Railway, or any container host with
-custom domain + volume support. For a bare-VPS path see
+The same topology works on Render, Railway, or any container host with
+custom-domain and volume support. For a bare-VPS path see
 [VPS guide](vps.md).

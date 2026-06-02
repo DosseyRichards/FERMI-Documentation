@@ -1,8 +1,8 @@
 # Reference
 
-Authoritative wire-level specs. If something on this page contradicts
-something on a concept page, this page is right and the concept page
-is out of date — please file an issue.
+Authoritative wire-level specifications. Where a reference page
+conflicts with a concept page, the reference page is authoritative and
+the concept page is out of date — please file an issue.
 
 - [Transaction format](tx.md)
 - [Block format](block.md)

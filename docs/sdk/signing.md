@@ -1,8 +1,8 @@
 # Signing transactions
 
-This page documents exactly what a valid WaveLedger transaction
-envelope looks like, what gets signed, and how to produce a valid
-signature outside the dApp.
+This page specifies the valid WaveLedger transaction envelope, the
+fields covered by the signature, and how to produce a valid signature
+outside the dApp.
 
 ## The envelope
 
@@ -53,16 +53,16 @@ signed_data = {
 Specifically excluded from the signature: `data`, `nonce`,
 `transaction_id`, `quantum_verified`.
 
-The reason: `data` is large (full contract bytecode for deploys) and
+Rationale: `data` is large (full contract bytecode for deploys) and
 re-signing it on every change makes hand-signing impractical. The
 integrity of `data` is enforced by `transaction_id`, which hashes the
 *entire* envelope including `data`'s effect — modifying `data` changes
-the id, which means the tx is treated as a different tx and rejected
-as a duplicate.
+the id, so the tx is treated as a different tx and rejected as a
+duplicate.
 
 The mempool also rejects any tx where `recipient`, `amount`, or `fee`
-differ from the signed values, so the 5-field signature is sufficient
-to bind a sender's intent to those four values for that timestamp.
+differ from the signed values. The 5-field signature thus binds a
+sender's intent to those four values for that timestamp.
 
 ## Computing the signature
 
@@ -106,7 +106,7 @@ tx_id = hashlib.sha3_512(
 ```
 
 The id is canonical SHA3-512 of the same `signed_data` dict used for
-signing — but **without** the signature. It's a content-address.
+signing, but **without** the signature. It serves as a content-address.
 
 ## Verifying a signature
 
@@ -136,13 +136,13 @@ nonce = blockchain.get_next_nonce(sender_address)
 ```
 
 The chain enforces `transaction.nonce == expected_nonce + addr_pending_count`
-for non-legacy txs. RBF works on `(sender, nonce)` pairs: same nonce
+for non-legacy txs. RBF operates on `(sender, nonce)` pairs: same nonce
 with a 10% higher fee replaces the older tx.
 
 ## Contract txs
 
-The signature math is the same for contract deploys + calls. Only the
-envelope differs:
+The signature math is identical for contract deploys and calls. Only
+the envelope differs:
 
 | Field | Deploy | Call |
 |---|---|---|

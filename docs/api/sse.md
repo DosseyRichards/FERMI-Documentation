@@ -1,9 +1,9 @@
 # Server-Sent Events
 
-The messenger pushes every chain-side state change to connected clients
-via a standard SSE stream — new blocks, new transactions of any kind,
-chat messages, and contract receipts. Optional server-side filtering by
-event type and by address keeps client code simple.
+The messenger pushes every chain-side state change to connected
+clients via a standard SSE stream: new blocks, new transactions of
+any kind, chat messages, and contract receipts. Optional server-side
+filtering by event type and by address keeps client code simple.
 
 ## GET /api/stream
 
@@ -56,8 +56,8 @@ GET /api/stream?types=tx,receipt&address=34378b1ba5be9d0999acd60be3a8a1f1
 
 #### `message`
 
-A chat-shaped tx (data dict carries `memo`). Payload mirrors what
-[`GET /api/messages`](chat.md#get-apimessages) returns:
+A chat-shaped transaction (data dict carries `memo`). The payload
+mirrors what [`GET /api/messages`](chat.md#get-apimessages) returns:
 
 ```json
 {
@@ -102,7 +102,7 @@ contract call):
 #### `block`
 
 A new block landed at the tip. One event per height; the SSE pumper
-catches up across multiple new blocks if needed.
+catches up across multiple new blocks as needed.
 
 ```json
 {
@@ -144,9 +144,9 @@ inlined:
 
 ### Dedupe
 
-Each event type has its own server-side dedupe window. Clients should
-still dedupe defensively on `tx_id` (for `message` / `tx` / `receipt`)
-and `height` (for `block`) in case of restart.
+Each event type has its own server-side dedupe window. Clients
+should dedupe defensively on `tx_id` (for `message` / `tx` /
+`receipt`) and `height` (for `block`) in case of restart.
 
 ### Example — browser
 
@@ -177,17 +177,18 @@ for line in r.iter_lines():
 
 ### Lifecycle
 
-- Connection drops when the client disconnects, or after ~30 min of idle
-  (depends on reverse proxy timeouts — fly's edge is configured for
-  long-lived connections; nginx defaults to 60s and needs tuning).
+- Connection drops when the client disconnects, or after ~30 min of
+  idle time (depending on reverse proxy timeouts; Fly's edge is
+  configured for long-lived connections, nginx defaults to 60s and
+  requires tuning).
 - The server pushes a heartbeat comment (`: heartbeat\n\n`) every 30s
-  so intermediaries don't time out idle streams.
+  to prevent intermediaries from timing out idle streams.
 - On error or reconnect, clients should re-query
   [`GET /api/messages?limit=100`](chat.md#get-apimessages) to catch
-  up any events they missed.
+  up any missed events.
 
 ### Backpressure
 
 Each connected client has a 64-event in-memory queue. If the queue
 fills (slow client), new events are dropped silently for that
-connection only — the chain isn't affected.
+connection only; the chain is unaffected.

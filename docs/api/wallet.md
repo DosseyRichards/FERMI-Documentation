@@ -1,8 +1,8 @@
 # Wallet API
 
-Wallet endpoints expose the user's address, balance, transaction
-history, and let them sign + submit transfer transactions or download
-an encrypted backup of their keypair.
+Wallet endpoints expose the user's address, balance, and transaction
+history, and allow signing and submitting transfer transactions or
+downloading an encrypted backup of the keypair.
 
 All endpoints below require a [session cookie](auth.md#session-cookies-end-users).
 
@@ -40,12 +40,12 @@ Returns the current user's wallet info.
 | Field | Type | Notes |
 |---|---|---|
 | `name` | string | The user's display name |
-| `address` | string (40 hex) | Their wallet address |
+| `address` | string (40 hex) | The user's wallet address |
 | `balance` | float | WAVE, confirmed (does not subtract pending outflows) |
 | `public_key` | string | Truncated ML-DSA-87 public key (UI display) |
 | `public_key_full` | string | Full hex of the public key |
 | `signature_scheme` | string | Always `"ML-DSA-87 (NIST FIPS 204)"` in v1 |
-| `transactions` | list | Last 25 in/out txs involving this address, newest first |
+| `transactions` | list | Last 25 in/out transactions involving this address, newest first |
 
 ### Errors
 
@@ -58,7 +58,7 @@ Returns the current user's wallet info.
 
 ## POST /api/wallet/send
 
-Sign + submit a WAVE transfer from the user's wallet.
+Sign and submit a WAVE transfer from the user's wallet.
 
 ### Request
 
@@ -85,8 +85,8 @@ Sign + submit a WAVE transfer from the user's wallet.
 }
 ```
 
-The tx is in the mempool. Confirmation lands in the next block (~5
-sec testnet, ~60 sec mainnet target).
+The transaction enters the mempool. Confirmation lands in the next
+block (~5 sec testnet, ~60 sec mainnet target).
 
 ### Errors
 
@@ -98,16 +98,19 @@ sec testnet, ~60 sec mainnet target).
 | 400 | `{"error":"tx rejected by mempool"}` | See mempool rules under [Blocks](../concepts/blocks.md#mempool-eligibility) |
 | 401 | Standard session errors | |
 
-The fee is fixed at **0.001 WAVE** for now (matches the contract gas
-fee). Custom-fee transfers will land with the next mempool revision.
+The fee is fixed at **0.001 WAVE** (matching the contract gas fee).
+
+### Future extensions
+
+Custom-fee transfers will land with the next mempool revision.
 
 ---
 
 ## POST /api/wallet/export { #export }
 
 Download an encrypted backup of the user's wallet. The backup is an
-AES-256-GCM ciphertext with the user's passphrase deriving the key
-via Argon2id.
+AES-256-GCM ciphertext; the encryption key is derived from the user's
+passphrase via Argon2id.
 
 ### Request
 
@@ -138,11 +141,14 @@ The wallet UI saves this as `waveledger-wallet-<address-prefix>.json`.
 ### Why AES-256-GCM on a post-quantum chain?
 
 AES-256-GCM is **post-quantum safe** per NIST SP 800-208 (Cat 5).
-Grover's algorithm halves symmetric security, so AES-256 → 128-bit
-quantum security, which is still infeasible. ML-DSA / ML-KEM are
-wrong tools for password-based file encryption (they target asymmetric
-signatures / key exchange). For a future "encrypted wallet handoff"
-between two on-chain ML-KEM keys, see the roadmap.
+Grover's algorithm halves symmetric security, so AES-256 yields
+128-bit quantum security, which remains infeasible to break. ML-DSA
+and ML-KEM are the wrong tools for password-based file encryption
+(they target asymmetric signatures and key exchange).
+
+#### Future extensions
+
+Encrypted wallet handoff between two on-chain ML-KEM keys.
 
 ### Errors
 
@@ -178,9 +184,9 @@ signed up (or been approved) under the target name.
 }
 ```
 
-This **replaces** whatever wallet the admin's approval created for that
-name — useful for users who want to bring an existing wallet to a new
-chat account.
+This **replaces** the wallet that the admin's approval created for
+that name, allowing users to bring an existing wallet to a new chat
+account.
 
 ### Errors
 

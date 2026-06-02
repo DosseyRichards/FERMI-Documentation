@@ -72,12 +72,12 @@ Expected time = `BLOCK_TIME_TARGET * (DIFFICULTY_ADJUSTMENT_INTERVAL - 1)` =
 
 The first transaction in every block is a "coinbase" — synthetic, no
 signature, sender = `"mining_reward"`. Its amount is the schedule
-subsidy plus the sum of fees from all other txs in the block.
+subsidy plus the sum of fees from all other transactions in the block.
 
 The subsidy is:
 $$ \text{subsidy}(h) = \frac{\text{INITIAL\_BLOCK\_REWARD}}{2^{\lfloor h / \text{HALVING\_INTERVAL} \rfloor}} $$
 
-with current values `INITIAL_BLOCK_REWARD = 5 WAVE`,
+with values `INITIAL_BLOCK_REWARD = 5 WAVE` and
 `HALVING_INTERVAL = 2,100,000` blocks. See
 [Tokenomics](../reference/tokenomics.md) for the full curve.
 
